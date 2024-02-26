@@ -7,7 +7,7 @@
         <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
     </head>
 
-    <body>
+    <body class="pb-5">
         @yield('body')
     </body>
 </html>
