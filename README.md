@@ -1,9 +1,9 @@
 <h1 align="center">
-    <img alt="Laravel Asaas" title="#Zoeweb" src="https://github.com/dgsoaresdev/integrated_total_lead/assets/25693566/c35e8cee-282c-4710-8bb9-6bc23ffdc6b8" />
+    <img alt="Laravel Asaas" title="Laravel Asaas" src="https://github.com/dgsoaresdev/laravel-asaas/assets/25693566/057de366-bde3-40e3-b446-911eb8562193" width="100%" />
 
 
 <h4 align="center"> 
-	🚧 Version 1.0 🚀 Under development... 🚧
+	🚧 Version 1.0 🚀 Em desenvolvimento... 🚧
 </h4>
 
 <p align="center">
@@ -40,7 +40,7 @@ Descrição...
 ### Title
 
 <p align="center">
-	<img alt="Trigger" title="#Trigger" src="https://github.com/dgsoaresdev/laravel-asaas/assets/25693566/057de366-bde3-40e3-b446-911eb8562193" width="100%" />
+	<img alt="Trigger" title="#Trigger" src="https://github.com/dgsoaresdev/integrated_total_lead/assets/25693566/c35e8cee-282c-4710-8bb9-6bc23ffdc6b8" width="49%" />
 </p>
 
 
