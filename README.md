@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img alt="Zoeweb" title="#Zoeweb" src="https://github.com/dgsoaresdev/integrated_total_lead/assets/25693566/46a841b8-7238-4dd6-bf10-7cbd5514f756" />
+    <img alt="Laravel Asaas" title="#Zoeweb" src="https://github.com/dgsoaresdev/integrated_total_lead/assets/25693566/c35e8cee-282c-4710-8bb9-6bc23ffdc6b8" />
 
 
 <h4 align="center"> 
