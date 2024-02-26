@@ -23,14 +23,14 @@
 sistema de processamento de pagamentos integrado ao ambiente de homologação do Asaas, levando em consideração que o cliente deve acessar uma página onde irá selecionar a opção de pagamento entre Boleto, Cartão ou Pix.
 
 ## 💻 ROADMAP
-Estruturas Globais: 100%
-Routes: 50%
-Controllers: 40%
-Views: 70%
-Models: 10%
-Migrations & Seeders: 10%
-API Asaas: 0%
-Deploy: 0%
+- Estruturas Globais: 100%
+- Routes: 50%
+- Controllers: 40%
+- Views: 70%
+- Models: 10%
+- Migrations & Seeders: 10%
+- API Asaas: 0%
+- Deploy: 0%
 
 ## 💻 Arquitetura
 
