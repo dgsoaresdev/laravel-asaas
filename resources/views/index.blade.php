@@ -4,11 +4,7 @@
         @section('title-page', 'Página Principal')
         @section('body')
         <header class="Header">
-            <div class="container">
-                <div class="row">
-                    @include('layouts._partials.topo')
-                </div>
-            </div>
+            @include('layouts._partials.topo')
         </header>
         <main class="main">
             <div class="container">
@@ -19,7 +15,7 @@
                                 <h2>Carrinho</h2>
                             </header>
                             <div class="Section-main">
-                                <a href="#" class="btn btn-primary">Proceder para o Checkout</a>
+                                <a href="{{ route('checkout') }}" class="btn btn-primary">Proceder para o Checkout</a>
                             </div>
 
                         </section>

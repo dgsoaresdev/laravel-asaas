@@ -1,10 +1,49 @@
 {{ $slot }}
-<form action="{{ route('checkout') }}" method="post">
+<form method="post">
     @csrf
-    <input name="nome" type="text" placeholder="Nome" class="borda-preta">
-    <br>
-    <input name="telefone" type="text" placeholder="Telefone" class="borda-preta">
-    <br>
-    <input name="email" type="text" placeholder="E-mail" class="borda-preta">
-    <br>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="nome">Nome</label>
+      <input type="text" class="form-control" id="nome" name="nome" placeholder="Seu nome...">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="sobrenome">Sobrenome</label>
+      <input type="text" class="form-control" id="sobrenome" name="sobrenome" placeholder="Seu sobrenome...">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="email">E-mail</label>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Seu E-mail...">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="telefone">Telefone</label>
+      <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(11) 88888-7777)">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="endereco">Endereço</label>
+    <input type="text" class="form-control" id="endereco"  name="endereco" placeholder="Logradouro, Bairro, Número...">
+  </div>
+  <div class="form-group">
+    <label for="complemento">Complemento</label>
+    <input type="text" class="form-control" id="complemento" name="complemento" placeholder="Bloco, Apartamento, ...">
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="cidade">Cidade</label>
+      <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Sua cidade...">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" class="form-control">
+        <option selected>Selecione...</option>
+        <option value="SP">SP</option>
+      </select>
+    </div>
+    <div class="form-group col-md-2">
+      <label for="cep">CEP</label>
+      <input type="text" class="form-control" id="cep" name="cep" placeholder="CEP...">
+    </div>
+  </div>
 </form>

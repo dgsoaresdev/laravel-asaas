@@ -4,11 +4,7 @@
         @section('title-page', 'Checkout')
         @section('body')
         <header class="Header">
-            <div class="container">
-                <div class="row">
-                    @include('layouts._partials.topo')
-                </div>
-            </div>
+            @include('layouts._partials.topo')
         </header>
         <main class="main">
             <div class="container">
@@ -19,7 +15,7 @@
                                 <h2>Checkout</h2>
                             </header>
                             <div class="Section-main d-flex flex-column flex-sm-row">
-                                <div class="col-12 col-sm-7">
+                                <div class="col-12 col-sm-7 p-3 p-sm-5">
                                 
                                     <div class="row">
 
@@ -51,23 +47,23 @@
                                         <h3>Resumo do pedido</h3>  
                                         <div class="mb-2 card col-12">
                                             <div class="card-body">                                         
-                                                <table>
+                                                <table class="table">
                                                     <thead>
-                                                        <th>
-                                                            <td>Item</td>
-                                                            <td>Quant.</td>
-                                                            <td>Preço</td>
-                                                            <td>Total</td>
-                                                        </th>
+                                                        <tr>
+                                                            <th escope="col">Item</th>
+                                                            <th escope="col">Quant.</th>
+                                                            <th escope="col">Preço</th>
+                                                            <th escope="col">Total</th>
+                                                        </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
+                                                        <tr escope="row">
                                                             <td>Item teste</td>
                                                             <td>1x</td>
                                                             <td>R$ 500,00</td>
                                                             <td>R$ 500,00</td>
                                                         </tr>
-                                                        <tr>
+                                                        <tr escope="row">
                                                             <td colspan="3">Total</td>
                                                             <td>R$ 500,00</td>
                                                         </tr>
@@ -82,20 +78,23 @@
                                         <h3>Pagamento</h3>
                                         <div class="mb-2 card col-12">
                                             <div class="card-body">
-                                                <h4 class="card-title">PIX</h4>
-                                                <a href="#" class="btn btn-primary">Pagar com segurança</a>
+                                                <h4 class="card-title"><strong>PIX</strong></h4>
+                                                @component('layouts._components.form_payment_pix')
+                                                @endcomponent
                                             </div>
                                         </div>
                                         <div class="mb-2 card col-12">
                                             <div class="card-body">
-                                                <h4 class="card-title">Cartão de Crédito</h4>
-                                                <a href="#" class="btn btn-primary">Pagar com segurança</a>
+                                                <h4 class="card-title"><strong>Cartão de Crédito</strong></h4>
+                                                @component('layouts._components.form_payment_card')
+                                                @endcomponent
                                             </div>
                                         </div>
                                         <div class="mb-2 card col-12">
                                             <div class="card-body">
-                                                <h4 class="card-title">Boleto</h4>
-                                                <a href="#" class="btn btn-primary">Pagar com segurança</a>
+                                                <h4 class="card-title"><strong>Boleto</strong></h4>
+                                                @component('layouts._components.form_payment_boleto')
+                                                @endcomponent
                                             </div>
                                         </div>
                                     </div>
