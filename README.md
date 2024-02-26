@@ -24,6 +24,7 @@ sistema de processamento de pagamentos integrado ao ambiente de homologação do
 
 ## 💻 ROADMAP
 Estruturas Globais: 100%
+Routes: 50%
 Controllers: 40%
 Views: 70%
 Models: 10%
@@ -33,7 +34,7 @@ Deploy: 0%
 
 ## 💻 Arquitetura
 
-Descrição:
+Descrição...
 
 
 ### Title
