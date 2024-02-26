@@ -22,13 +22,10 @@
 ## 💻 Sobre o projeto
 sistema de processamento de pagamentos integrado ao ambiente de homologação do Asaas, levando em consideração que o cliente deve acessar uma página onde irá selecionar a opção de pagamento entre Boleto, Cartão ou Pix.
 
-## 🎨 Arquitetura
+## 💻 Arquitetura
 
 Descrição:
 
-<a href="https://www.figma.com/file/AsUalVskcxNscoLtY4T5qf/Integrated-total-lead?type=design&node-id=0%3A1&mode=design&t=wP5ih5yknGdlPsZf-1" target="blank">
-<img alt="Figma" src="https://img.shields.io/static/v1?label=prototyping&message=Figma&color=red&style=flat&logo=figma&logoColor=#FFFFFF" />
-</a>
 
 ### Title
 
