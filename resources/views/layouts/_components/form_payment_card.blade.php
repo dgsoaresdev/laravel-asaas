@@ -1,6 +1,3 @@
-{{ $slot }}
-<form action="{{ route('checkout') }}" method="post">
-    @csrf
  <div class="form-row">
      <div class="form-group col-md-6">
       <label for="cartao_nome">Nome impresso no cartão</label>
@@ -42,7 +39,6 @@
     
 <div class="form-row">
   <div class="form-group">
-  <button type="submit" class="btn btn-success">Pagar com segurança</button>
+  <button type="submit" name="payment_method" value="cartao" class="btn btn-success">Pagar com segurança</button>
   </div>
   </div>
-</form>

@@ -1,6 +1,3 @@
-{{ $slot }}
-<form method="post">
-    @csrf
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="nome">Nome</label>
@@ -11,6 +8,7 @@
       <input type="text" class="form-control" id="sobrenome" name="sobrenome" placeholder="Seu sobrenome..." required>
     </div>
   </div>
+
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="email">E-mail</label>
@@ -21,6 +19,7 @@
       <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(11) 88888-7777)" required>
     </div>
   </div>
+<div class="form-row">
   <div class="form-group">
     <label for="endereco">Endereço</label>
     <input type="text" class="form-control" id="endereco"  name="endereco" placeholder="Logradouro, Bairro, Número..." required>
@@ -29,6 +28,8 @@
     <label for="complemento">Complemento</label>
     <input type="text" class="form-control" id="complemento" name="complemento" placeholder="Bloco, Apartamento, ..." required>
   </div>
+  </div>
+
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="cidade">Cidade</label>
@@ -46,14 +47,14 @@
       <input type="text" class="form-control" id="cep" name="cep" placeholder="CEP..." required>
     </div>
   </div>
+
   <div class="form-row">
-  <div class="form-group p-2">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="gridCheck" required>
-      <label class="form-check-label" for="gridCheck">
-        Li e  Concordo com os <a href="#">Termos e Políticas</a> da plataforma.
-      </label>
+    <div class="form-group p-2">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="gridCheck" required>
+        <label class="form-check-label" for="gridCheck">
+          Li e  Concordo com os <a href="#">Termos e Políticas</a> da plataforma.
+        </label>
+      </div>
     </div>
   </div>
-  </div>
-</form>

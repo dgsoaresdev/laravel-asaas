@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 
  Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+ Route::post('/checkout', [CheckoutController::class, 'create'])->name('checkout');
 
  //Route::get('/thank_you_page', [CheckoutController::class, 'index'])->name('thankyou');
 

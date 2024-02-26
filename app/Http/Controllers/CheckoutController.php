@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Checkout;
 use App\Http\Requests\StoreCheckoutRequest;
 use App\Http\Requests\UpdateCheckoutRequest;
+use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
@@ -13,9 +14,8 @@ class CheckoutController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( Request $request )
     {
-        //
         return view('checkout');
     }
 
@@ -24,9 +24,14 @@ class CheckoutController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create( Request $request )
     {
         //
+        if ( isset($request)) {
+            dd($request);
+            //echo $request->cartao_nome;
+        }
+        return view('checkout');
     }
 
     /**
