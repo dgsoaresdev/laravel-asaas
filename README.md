@@ -73,6 +73,5 @@ $ cd integrated_total_lead
 This project is licensed under the MIT license.
 
 Made with ❤️ by Diogo Soares 👋🏽 [Contact me!](https://www.linkedin.com/in/dgsoares/)
-<hr>
-README inspired by: Ecoleta by Thiago Marinho [Thiago Marinh!](https://github.com/tgmarinho/Ecoleta/blob/master/README.md)
+
 
