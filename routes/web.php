@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CheckoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('index');
+})->name('index');
+
+
+ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+
+ //Route::get('/thank_you_page', [CheckoutController::class, 'index'])->name('thankyou');
+
+
+Route::fallback( function() 
+{
+    echo 'A rota acessda não existe. <a href="'.route('site.index').'">Clique aqui</a> para voltar à home.';
+}
+);
