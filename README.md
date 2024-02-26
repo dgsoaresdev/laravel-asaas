@@ -82,10 +82,10 @@ $ cd laravel-asaas
 $ composer install
 
 ## Crie as tabelas do banco dados
-$ php artisan migrate
+$ php artisan make:migration
 
 ## Popule os dados iniciais de teste nas tabelas
-$ php artisan migrate --seed
+$ php artisan db:seed
 
 ```
 
