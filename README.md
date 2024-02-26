@@ -58,10 +58,10 @@ Também é bom ter um editor para trabalhar com o código como [VSCode][vscode]
 ### 🎲 Running theme
 ```bash
 # Clone este repositório
-$ git clone git@github.com:dgsoaresdev/integrated_total_lead.git
+$ git clone git@github.com:dgsoaresdev/laravel-asaas.git
 
 # Access project folder in terminal/cmd
-$ cd integrated_total_lead
+$ cd laravel-asaas
 
 ```
 
