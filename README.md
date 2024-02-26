@@ -47,6 +47,11 @@ As seguintes ferramentas foram usadas na construção do projeto:
 - jQuery
 - Ajax
 
+## 🛠 Integrações
+
+Gateway da Asaas
+- Documentação da API: https://asaasv3.docs.apiary.io/
+- Link do sandbox: https://sandbox.asaas.com/
 
 
 ## 🚀 Como rodar o projeto?
@@ -57,11 +62,20 @@ Também é bom ter um editor para trabalhar com o código como [VSCode][vscode]
 
 ### 🎲 Running theme
 ```bash
-# Clone este repositório
+## Clone este repositório
 $ git clone git@github.com:dgsoaresdev/laravel-asaas.git
 
-# Access project folder in terminal/cmd
+## Acesse o diretório do projeto via terminal/cmd
 $ cd laravel-asaas
+
+##Instale as dependências do projeto, via composer
+$ composer install
+
+## Crie as tabelas do banco dados
+$ php artisan migrate
+
+## Popule os dados iniciais de teste nas tabelas
+$ php artisan migrate --seed
 
 ```
 
