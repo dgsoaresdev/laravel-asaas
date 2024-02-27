@@ -94,7 +94,7 @@ class CheckoutController extends Controller
             $request_api = $this->request_gateway_api();
             
 
-            if( $request_api ) {
+            if( !empty( $request_api ) ) {
                 $order_code = '123456789';
                 $status_request = 'success';
                 $trans_code = '11111';
@@ -117,11 +117,37 @@ class CheckoutController extends Controller
     Request API
     */
 
-    public function request_gateway_api($data="")
+    public function request_gateway_api($type="", $data="")
     {
-        return true;
+        // return true;
 
-        //$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNzUxOTM6OiRhYWNoXzgxOTdiMjQyLTU5MDMtNGEzNS1iMzJmLTgzMzg5YmM0NThhYw==
+        if( $type == 'customer') {
+
+        } elseif( $type == 'order' ) {
+            
+        } elseif( $type == 'payment' ) {
+            
+        }
+
+        $client = new \GuzzleHttp\Client();
+
+        $response = $client->request('POST', 'https://sandbox.asaas.com/api/v3/customers', [
+        'body' => '{"name":"John Doe","email":"john.doe@asaas.com.br","phone":"4738010919","mobilePhone":"4799376637","cpfCnpj":"24971563792","postalCode":"01310-000","address":"Av. Paulista","addressNumber":"150","complement":"Sala 201","province":"Centro","externalReference":"12987382","notificationDisabled":false,"additionalEmails":"john.doe@asaas.com,john.doe.silva@asaas.com.br","municipalInscription":"46683695908","stateInscription":"646681195275","observations":"ótimo pagador, nenhum problema até o momento"}',
+        'headers' => [
+            'accept' => 'application/json',
+            'access_token' => '$aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNzUxOTM6OiRhYWNoXzgxOTdiMjQyLTU5MDMtNGEzNS1iMzJmLTgzMzg5YmM0NThhYw==',
+            'content-type' => 'application/json',
+        ],
+        ]);
+
+        $response_content = $response->getBody();
+
+        return $response_content;
+
+
+
+
+        //KEY: $aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwNzUxOTM6OiRhYWNoXzgxOTdiMjQyLTU5MDMtNGEzNS1iMzJmLTgzMzg5YmM0NThhYw==
     }
 
     /**
