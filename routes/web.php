@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CheckoutController;
 
 /*
@@ -14,13 +15,17 @@ use App\Http\Controllers\CheckoutController;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-})->name('index');
+// Route::get('/', function () {
+//     return view('index');
+// })->name('index');
 
+Route::get('/', [HomeController::class, 'index'])->name('index');
 
- Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
- Route::post('/checkout', [CheckoutController::class, 'create'])->name('checkout');
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('/checkout', [CheckoutController::class, 'create'])->name('checkout');
+Route::get('/checkout/{order_code}/{status_checkout_request}/{trans_code?}', [CheckoutController::class, 'processing'])->name('checkout.processing');
+//Route::get('/checkout/processing/{p1}/{p2}', [CheckoutController::class, 'obrigado'])->name('checkout.obrigado');
+
 
  //Route::get('/thank_you_page', [CheckoutController::class, 'index'])->name('thankyou');
 

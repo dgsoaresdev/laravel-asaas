@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Order extends Model
+class Customer extends Model
 {
     use HasFactory;
 
     public function item_details( $item_id = "")
     {
         if ($item_id) {
-            $order_details = Order::where('code', '=', $item_id)->get();
-            if( count($order_details ) > 0 ) {
-                return $order_details;
+            $data_details = Customer::where('id', '=', $item_id)->get();
+            if( count($data_details ) > 0 ) {
+                return $data_details;
             } else {
                 return null;
             }
