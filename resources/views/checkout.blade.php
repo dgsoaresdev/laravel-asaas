@@ -4,6 +4,8 @@
         @section('title-page', 'Checkout')
         @section('body')
         {{-- Recupera dados do cadastro, no caso de um checkout com erro --}}
+       
+        
         @if( isset( $order_code ) && isset( $get_order_details ) && isset( $get_customer_details ) )
             @php
                 $data_fields = array(
@@ -43,6 +45,8 @@
             @endphp
         @endif
         {{-- End - Recupera dados do cadastro, no caso de um checkout com erro --}}
+
+        
         <header class="Header">
             @include('layouts._partials.topo')
         </header>

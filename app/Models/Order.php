@@ -12,7 +12,7 @@ class Order extends Model
     public function item_details( $item_id = "")
     {
         if ($item_id) {
-            $order_details = Order::where('code', '=', $item_id)->get();
+            $order_details = Order::where('gateway_code', '=', $item_id)->get();
             if( count($order_details ) > 0 ) {
                 return $order_details;
             } else {
