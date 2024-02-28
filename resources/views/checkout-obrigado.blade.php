@@ -26,12 +26,22 @@
 
                                     <div class="row">
                                         <div class="mb-2 card col-12">
-                                            <div class="mt-3">
-                                                <h4 class="card-title">Pague com o <strong>{{ $get_order_details['payment_method'] }}</strong></h4>
-                                            </div>
                                             @if ( $get_order_details['payment_status'] == 'pending' )
-                                                @component('layouts._components.form_payment_'.$get_order_details['payment_method'], ['order_code'=>$order_code, 'get_order_details'=>$get_order_details, 'get_customer_details'=>$get_customer_details, 'get_payment_details' => $get_payment_details])
+
+                                                <div class="mt-3">
+                                                    <h4 class="card-title">Pague com o <strong>{{ $get_order_details['payment_method'] }}</strong></h4>
+                                                </div>                                            
+                                                @component('layouts._components.proccess_payment_'.$get_order_details['payment_method'], ['order_code'=>$order_code, 'get_order_details'=>$get_order_details, 'get_customer_details'=>$get_customer_details, 'get_payment_details' => $get_payment_details])
                                                 @endcomponent
+                                                
+                                            @else
+
+                                                <div class="mt-3">
+                                                    <h4 class="card-title">Detalhes da compra com <strong>{{ $get_order_details['payment_method'] }}</strong></h4>
+                                                </div>                                            
+                                                @component('layouts._components.proccess_payment_'.$get_order_details['payment_method'], ['order_code'=>$order_code, 'get_order_details'=>$get_order_details, 'get_customer_details'=>$get_customer_details, 'get_payment_details' => $get_payment_details])
+                                                @endcomponent
+
                                             @endif  
                                         </div>
                                     </div>

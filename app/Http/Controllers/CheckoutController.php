@@ -119,11 +119,18 @@ class CheckoutController extends Controller
             */
             $order = new Order();
 
+            if ( $request->input('payment_method') == 'pix') {
+                
+                $order_status = 'draft';
+            } else {
+                $order_status = 'pending';
+             }
+
             $order->gateway_code        = '';
             $order->customer_id         = $customer_id;
             $order->line_items          = json_encode( $shoppingCart );
             $order->amout               = $cart_total_price;
-            $order->status              = 'draft';
+            $order->status              = $order_status;
             $order->payment_status      = 'pending';
             $order->payment_method      = $request->input('payment_method');
             $order->payment_details     = '';
@@ -170,19 +177,98 @@ class CheckoutController extends Controller
                 // Request create order in gateway API and get gateway customer ID.
                 //$gateway_order = $this->request_gateway_api("customer", "POST", $CURLOPT_POSTFIELDS_order, ""); // ($type, $verb, $data, $param1) // PROD
                 $gateway_order = $this->request_gateway_api_debug("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method); // DEBUG
-                $gateway_order = json_decode( $gateway_order );                
+                $gateway_order = json_decode( $gateway_order );   
 
                 if ( isset( $gateway_order->id ) ){
+
+
+                    // Renomeando o valor da string de status do retorno do gateway para o padrão da plataforma.
+                    switch( $gateway_order->status ) {
+                        case 'PENDING' :
+                            $status_order = 'pending';
+                            break;
+                        case 'RECEIVED' :
+                            $status_order = 'received';
+                            break;
+                        case 'CONFIRMED' :
+                            $status_order = 'confirmed';
+                            break;    
+                        default :
+                            $status_order = 'pending';
+                            break;
+                    }
+
                     $order->gateway_code = $gateway_order->id;
-                    $order->status       = 'pending';
+                    
+                    
+                 //  dd($gateway_payment);
 
                 if ( $order->payment_method == 'pix' ) {
-                    // Faz uma nova requisição
+
+                    // Faz uma nova requisição para obter os dados do QRCode e Chave PIX
                     //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
                     $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
                     $gateway_payment = json_decode($gateway_payment);
-                    if ( isset($gateway_payment->success) && $gateway_payment->success ) {
-                        //dd($gateway_payment);
+
+                    // // Renomeando o valor da string de status do retorno do gateway para o padrão da plataforma.
+                    // switch( $gateway_payment->status ) {
+                    //     case 'PENDING' :
+                    //         $status_payment = 'pending';
+                    //         break;
+                    //     case 'RECEIVED' :
+                    //         $status_payment = 'received';
+                    //         break;
+                    //     case 'CONFIRMED' :
+                    //         $status_payment = 'confirmed';
+                    //         break;    
+                    //     default :
+                    //         $status_payment = 'pending';
+                    //         break;
+                    // }
+                    
+
+                    // Build Strings
+                    $payment_payment_auth        = null;
+                    $payment_date_time           = null;
+                    $payment_status              = 'pending';
+                    $payment_payment_status      = 'pending';
+                    $payment_date_due            = $gateway_payment->expirationDate;
+                    $payment_payment_details     = $gateway_payment->payload;
+                    $payment_payment_doc         = $gateway_payment->encodedImage;
+
+                } elseif ( $order->payment_method == 'boleto' ) {
+                        // Faz uma nova requisição para obter os dados de código debarras e PDF
+                        //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
+                        // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
+                        // $gateway_payment = json_decode($gateway_payment);
+
+                        // Build Strings
+                        $payment_payment_auth        = null;
+                        $payment_date_time           = null;
+                        $payment_status              = 'pending';
+                        $payment_payment_status      = 'pending';
+                        $payment_date_due            = $gateway_order->dueDate;
+                        $payment_payment_details     = $gateway_order->invoiceUrl;
+                        $payment_payment_doc         = $gateway_order->bankSlipUrl;
+
+                } elseif ( $order->payment_method == 'cartao' ) {
+                        // Faz uma nova requisição para obter os dados de código debarras e PDF
+                        //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
+                        // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
+                        // $gateway_payment = json_decode($gateway_payment);
+
+                        // Build Strings
+                        $payment_payment_auth        = null;
+                        $payment_date_time           = $gateway_order->confirmedDate;
+                        $payment_status              = $status_order;
+                        $payment_payment_status      = $status_order;
+                        $payment_date_due            = $gateway_order->dueDate;
+                        $payment_payment_details     = json_encode($gateway_order->creditCard);
+                        $payment_payment_doc         = $gateway_order->transactionReceiptUrl;
+
+                }
+
+                    if ( $order->payment_method != 'pix' || $order->payment_method == 'pix' && isset($gateway_payment->success) && $gateway_payment->success ) { // Se for PIX
 
                         $payment = new Payment();
 
@@ -190,32 +276,32 @@ class CheckoutController extends Controller
                         $payment->order_id            = $order_id;
                         $payment->customer_id         = $customer_id;
                         $payment->amout               = $cart_total_price;
-                        $payment->status              = 'pending';
-                        $payment->payment_status      = 'pending';
+                        $payment->status              = $payment_status;
+                        $payment->payment_status      = $payment_payment_status;
                         $payment->payment_method      = $request->input('payment_method');
-                        $payment->payment_details     = $gateway_payment->payload;
-                        $payment->payment_doc         = $gateway_payment->encodedImage;
-                        $payment->payment_auth        = null;
-                        $payment->date_time           = null;
-                        $payment->date_due           = $gateway_payment->expirationDate;
+                        $payment->payment_details     = $payment_payment_details;
+                        $payment->payment_doc         = $payment_payment_doc;
+                        $payment->payment_auth        = $payment_payment_auth;
+                        $payment->payment_date_time   = $payment_date_time;
+                        $payment->date_due            = $payment_date_due;
 
                         $payment->save();
 
                     } 
-                }
+                
                     
-                    // Renomeando o valor da string de status do retorno do gateway para o padrão da plataforma.
-                    switch( $order->payment_method ) {
-                        case 'PENDING' :
-                            $status_order = 'pending';
-                            break;
-                        case 'RECEIVED' :
-                            $status_order = 'received';
-                            break;
-                        default :
-                            $status_order = 'pending';
-                            break;
-                        }
+                    
+
+                    // Atualizando o Status do pedido
+                    // if( $request->input('payment_method') == 'cartao' ) {
+                    //     $order_status    = $gateway_payment->status;
+                    // } else {
+                    //     $order->status   = 'pending';
+                    // }
+
+                    // Atualizando o Status do pedido
+                    $order->status              = $status_order;
+                    $order->payment_status      = $status_order;
 
                     $order->save(); // salva o ID (gateway) do pedido
 
@@ -354,15 +440,19 @@ class CheckoutController extends Controller
      */
     public function request_gateway_api_debug($type="", $verb="", $data="", $param1 = "")
     {  
+        
         if ( $type == "customer" && $verb == 'POST' ) {
-            
+          // Simulação de response do Cadastro de cliente  
             return '
             {"object":"customer","id":"cus_000005897333","dateCreated":"2024-02-28","name":"Marcelo Almeida","email":"marcelo.almeida@gmail.com","company":null,"phone":"4738010919","mobilePhone":"47999376637","address":"Av. Paulista","addressNumber":"150","complement":"Sala 201","province":"Centro","postalCode":"01310000","cpfCnpj":"24971563792","personType":"FISICA","deleted":false,"additionalEmails":"marcelo.almeida2@gmail.com,marcelo.almeida3@gmail.com","externalReference":"12987382","notificationDisabled":false,"observations":"ótimo pagador, nenhum problema até o momento","municipalInscription":"46683695908","stateInscription":"646681195275","canDelete":true,"cannotBeDeletedReason":null,"canEdit":true,"cannotEditReason":null,"city":12565,"state":"SP","country":"Brasil"}';
         
         } elseif ( $type == "customer" && $verb == 'GET' ) {
+            // Simulação de response da pesquisa por cliente
 
         } elseif ( $type == "order" && $verb == 'POST' ) {
+            // Simulação de resopnse do cadastro de cobrança (pedido / order)
             if( $param1  == 'PIX' || $param1  == 'pix' ) {
+                // Se a cobrança for via PIX
                 return '
                 {
                     "object": "payment",
@@ -415,6 +505,110 @@ class CheckoutController extends Controller
                     "refunds": null
                 }
                 ';
+            } elseif( $param1  == 'BOLETO' || $param1  == 'boleto' ) {
+                // se a cobrança for via boleto
+                return '
+                {
+                    "object": "payment",
+                    "id": "pay_517hlrt65agypbai",
+                    "dateCreated": "2024-02-28",
+                    "customer": "cus_000005897333",
+                    "paymentLink": null,
+                    "value": 250,
+                    "netValue": 249.01,
+                    "originalValue": null,
+                    "interestValue": null,
+                    "description": "Pedido: 12345",
+                    "billingType": "BOLETO",
+                    "canBePaidAfterDueDate": true,
+                    "pixTransaction": null,
+                    "status": "PENDING",
+                    "dueDate": "2024-03-05",
+                    "originalDueDate": "2024-03-05",
+                    "paymentDate": null,
+                    "clientPaymentDate": null,
+                    "installmentNumber": null,
+                    "invoiceUrl": "https://sandbox.asaas.com/i/517hlrt65agypbai",
+                    "invoiceNumber": "05177941",
+                    "externalReference": "111111",
+                    "deleted": false,
+                    "anticipated": false,
+                    "anticipable": false,
+                    "creditDate": null,
+                    "estimatedCreditDate": null,
+                    "transactionReceiptUrl": null,
+                    "nossoNumero": "1480998",
+                    "bankSlipUrl": "https://sandbox.asaas.com/b/pdf/517hlrt65agypbai",
+                    "lastInvoiceViewedDate": null,
+                    "lastBankSlipViewedDate": null,
+                    "discount": {
+                      "value": 0,
+                      "limitDate": null,
+                      "dueDateLimitDays": 0,
+                      "type": "FIXED"
+                    },
+                    "fine": {
+                      "value": 0,
+                      "type": "FIXED"
+                    },
+                    "interest": {
+                      "value": 0,
+                      "type": "PERCENTAGE"
+                    },
+                    "postalService": false,
+                    "custody": null,
+                    "refunds": null
+                  }
+                ';
+
+            } elseif( $param1  == 'CREDIT_CARD' || $param1  == 'cartao' ) {
+
+                // Se a cobraça for via cartão
+                return '
+                {
+                    "object": "payment",
+                    "id": "pay_4t9669bm23qod0wn",
+                    "dateCreated": "2024-02-28",
+                    "customer": "cus_000005897333",
+                    "paymentLink": null,
+                    "value": 1000,
+                    "netValue": 979.61,
+                    "originalValue": null,
+                    "interestValue": null,
+                    "description": "Pedido: 123",
+                    "billingType": "CREDIT_CARD",
+                    "confirmedDate": "2024-02-28",
+                    "creditCard": {
+                      "creditCardNumber": "8829",
+                      "creditCardBrand": "MASTERCARD",
+                      "creditCardToken": "a14d306f-569a-4f46-a2c9-9e3c2aed3478"
+                    },
+                    "pixTransaction": null,
+                    "status": "CONFIRMED",
+                    "dueDate": "2024-03-05",
+                    "originalDueDate": "2024-03-05",
+                    "paymentDate": null,
+                    "clientPaymentDate": "2024-02-28",
+                    "installmentNumber": null,
+                    "invoiceUrl": "https://sandbox.asaas.com/i/4t9669bm23qod0wn",
+                    "invoiceNumber": "05177975",
+                    "externalReference": "12345",
+                    "deleted": false,
+                    "anticipated": false,
+                    "anticipable": false,
+                    "creditDate": "2024-04-01",
+                    "estimatedCreditDate": "2024-04-01",
+                    "transactionReceiptUrl": "https://sandbox.asaas.com/comprovantes/9003141297288889",
+                    "nossoNumero": null,
+                    "bankSlipUrl": null,
+                    "lastInvoiceViewedDate": null,
+                    "lastBankSlipViewedDate": null,
+                    "postalService": false,
+                    "custody": null,
+                    "refunds": null
+                  }
+                ';
+
             }
 
         } elseif ( $type == "order" && $verb == 'GET' ) {
@@ -430,6 +624,10 @@ class CheckoutController extends Controller
                     "expirationDate": "2024-02-28 23:59:59"
                   }
                 ';
+            } elseif ( $param1 == 'BOLETO' ) {
+
+            } elseif ( $param1 == 'CREDIT_CARD' ) {
+
             }
 
         }
@@ -470,7 +668,7 @@ class CheckoutController extends Controller
 
             $get_order = new Order();
             $get_order_details = $get_order->item_details($order_code);
-
+            
                 if($get_order_details) {
 
                     $get_order_details = $get_order_details[0];

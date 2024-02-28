@@ -12,7 +12,7 @@ class Customer extends Model
     public function item_details( $item_id = "")
     {
         if ($item_id) {
-            $data_details = Customer::where('id', '=', $item_id)->get();
+            $data_details = Customer::where('id', '=', $item_id)->orderBy('id', 'DESC')->get();
             if( count($data_details ) > 0 ) {
                 return $data_details;
             } else {

@@ -26,7 +26,7 @@ class CreatePaymentsTable extends Migration
             $table->text('payment_details')->nullable();
             $table->text('payment_doc')->nullable();
             $table->string('payment_auth',255)->nullable();
-            $table->dateTime('date_time', $precision = 0)->nullable();
+            $table->dateTime('payment_date_time', $precision = 0)->nullable();
             $table->date('date_due')->nullable();
         });
     }
