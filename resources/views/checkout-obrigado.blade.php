@@ -5,15 +5,14 @@
         @section('body')
         <header class="Header">
             @include('layouts._partials.topo')
-        </header>
-        
+        </header>        
         <main class="main">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
                         <section class="Section">
                             <header class="Section-header">
-                                <h2>Checkout</h2>
+                                <h2>Finalizando pedido com o {{ $get_order_details['payment_method'] }}</h2>
                             </header>
                             <div class="Section-main d-flex flex-column flex-sm-row col-12">
                                 <div class="col-12 col-sm-7 p-3 p-sm-4">
@@ -21,23 +20,19 @@
                                     <div class="row">
 
                                         <div class="mb-2">
-                                            <h3>Dados Pessoais</h3>
+                                            <h3>{{ $get_order_details['payment_status'] == 'pending' ? 'Dados para pagamento' : 'Detalhes do pedido' }} </h3>
                                         </div>
-                                        <div class="mb-2 card col-12">
-                                            <div class="card-body">
-                                                <h4 class="card-title">Você já tem cadastro? <strong><a href="#">Faça o login</a></strong></h4>
-                                            </div>
-                                        </div>
-
                                     </div>
 
                                     <div class="row">
                                         <div class="mb-2 card col-12">
-                                            <div class="card-body">
-                                                <h4 class="card-title">Ainda não possui cadastro? <strong>Cadastre-se</strong></h4>
+                                            <div class="mt-3">
+                                                <h4 class="card-title">Pague com o <strong>{{ $get_order_details['payment_method'] }}</strong></h4>
                                             </div>
-                                            {{-- @component('layouts._components.form_cadastro')
-                                            @endcomponent --}}
+                                            @if ( $get_order_details['payment_status'] == 'pending' )
+                                                @component('layouts._components.form_payment_'.$get_order_details['payment_method'], ['order_code'=>$order_code, 'get_order_details'=>$get_order_details, 'get_customer_details'=>$get_customer_details, 'get_payment_details' => $get_payment_details])
+                                                @endcomponent
+                                            @endif  
                                         </div>
                                     </div>
 
@@ -60,19 +55,26 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                    {{-- @php $cart_total_price = 0 @endphp --}}
-                                                   
-                                                    {{-- @php $cart_total_price += $item_total_price @endphp --}}
-                                                        <tr escope="row">
-                                                            <td>111</td>
-                                                            <td>1x</td>
-                                                            <td>R$ 111</td>
-                                                            <td>R$ 111</td>
-                                                        </tr>
+                                                    @php
+                                                        $get_order_details = json_decode($get_order_details);
+                                                        $total_price = 0; 
+                                                        $get_order_details_lineItems = json_decode($get_order_details->line_items);
+                                                        //var_dump($get_order_details_lineItems);
+                                                        @endphp
+
+                                                        @foreach( $get_order_details_lineItems as $item_key => $item_value )
+                                                            @php $total_price += $item_value->price @endphp
+                                                            <tr escope="row">
+                                                                <td>{{ $item_value->name }}</td>
+                                                                <td>{{ $item_value->amout }}x</td>
+                                                                <td>R$ {{ $item_value->price }}</td>
+                                                                <td>R$ {{ $item_value->price * $item_value->amout }}</td>
+                                                            </tr>
+                                                        @endforeach
                                                    
                                                         <tr escope="row">
                                                             <td colspan="3">Total  </td>
-                                                            <td>R$ 111</td>
+                                                            <td>R$ {{ $total_price }}</td>
                                                         </tr>
                                                  
                                                     </tbody>
@@ -81,31 +83,6 @@
                                             </div>                                      
                                         </div>
                                     </div> 
-
-                                    <div class="row mt-3">
-                                        <h3>Pagamento</h3>
-                                        <div class="mb-4 card col-12">
-                                            <div class="card-body">
-                                                <h4 class="card-title"><strong>PIX</strong></h4>
-                                                {{-- @component('layouts._components.form_payment_pix')
-                                                @endcomponent --}}
-                                            </div>
-                                        </div>
-                                        <div class="mb-4 card col-12">
-                                            <div class="card-body">
-                                                <h4 class="card-title"><strong>Cartão de Crédito</strong></h4>
-                                                {{-- @component('layouts._components.form_payment_card')
-                                                @endcomponent --}}
-                                            </div>
-                                        </div>
-                                        <div class="mb-4 card col-12">
-                                            <div class="card-body">
-                                                <h4 class="card-title"><strong>Boleto</strong></h4>
-                                                {{-- @component('layouts._components.form_payment_boleto')
-                                                @endcomponent --}}
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                                 </form>
                             </div>

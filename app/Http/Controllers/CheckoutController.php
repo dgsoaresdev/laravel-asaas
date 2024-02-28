@@ -209,8 +209,8 @@ class CheckoutController extends Controller
                         case 'PENDING' :
                             $status_order = 'pending';
                             break;
-                        case 'APROVED' :
-                            $status_order = 'aproved';
+                        case 'RECEIVED' :
+                            $status_order = 'received';
                             break;
                         default :
                             $status_order = 'pending';
@@ -477,10 +477,16 @@ class CheckoutController extends Controller
 
                     $get_customer = new Customer();
                     $get_customer_details = $get_customer->item_details($get_order_details->customer_id);
+                    
+                    $get_payment = new Payment();
+                    $get_payment_details = $get_payment->item_details($get_order_details->id);
+                    $get_payment_details = $get_payment_details[0];
+
                     if( $get_customer_details ) {
                         $get_customer_details = $get_customer_details[0];
+                        
 
-                        return view('checkout-obrigado', compact( 'order_code', 'get_order_details', 'get_customer_details' ));
+                        return view('checkout-obrigado', compact( 'order_code', 'get_order_details', 'get_customer_details', 'get_payment_details' ));
                     } else {
                         return redirect('/checkout');
                     }
