@@ -6,6 +6,7 @@
         <header class="Header">
             @include('layouts._partials.topo')
         </header>        
+        {{-- {{ Request::ip(); }} --}}
         <main class="main">
             <div class="container">
                 <div class="row">

@@ -38,6 +38,7 @@ class CheckoutController extends Controller
         $trans_code = null;
         $order_id = null;
         $order_code = null;
+        $get_ip_user = $request->ip();
 
         if ( isset($request)) {
 
@@ -134,7 +135,8 @@ class CheckoutController extends Controller
             $order->payment_status      = 'pending';
             $order->payment_method      = $request->input('payment_method');
             $order->payment_details     = '';
-            $order->checkout_status     = 'open';    
+            $order->checkout_status     = 'open';
+            $order->ip_user             = $get_ip_user;    
 
             $CurrentDate = date('Y-m-d');
             // Renomeando o valor da string do método de pagamento para o padrão do gateway.
@@ -170,13 +172,13 @@ class CheckoutController extends Controller
                     "dueDate": "'.$due_date.'",
                     "value": '.$order->amout.',
                     "description": "Pedido: '.$order_id.'",
-                    "externalReference": "'.$order_id.'",
+                    "externalReference": "'.$order_id.'"
                   }
                 ';               
                 
                 // Request create order in gateway API and get gateway customer ID.
-                //$gateway_order = $this->request_gateway_api("customer", "POST", $CURLOPT_POSTFIELDS_order, ""); // ($type, $verb, $data, $param1) // PROD
-                $gateway_order = $this->request_gateway_api_debug("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method); // DEBUG
+                //$gateway_order = $this->request_gateway_api("customer", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // ($type, $verb, $data, $param1) // PROD
+                $gateway_order = $this->request_gateway_api_debug("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // DEBUG
                 $gateway_order = json_decode( $gateway_order );   
 
                 if ( isset( $gateway_order->id ) ){
@@ -201,72 +203,72 @@ class CheckoutController extends Controller
                     $order->gateway_code = $gateway_order->id;
                     
                     
-                 //  dd($gateway_payment);
+                    //  dd($gateway_payment);
 
-                if ( $order->payment_method == 'pix' ) {
+                    if ( $order->payment_method == 'pix' ) {
 
-                    // Faz uma nova requisição para obter os dados do QRCode e Chave PIX
-                    //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
-                    $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
-                    $gateway_payment = json_decode($gateway_payment);
-
-                    // // Renomeando o valor da string de status do retorno do gateway para o padrão da plataforma.
-                    // switch( $gateway_payment->status ) {
-                    //     case 'PENDING' :
-                    //         $status_payment = 'pending';
-                    //         break;
-                    //     case 'RECEIVED' :
-                    //         $status_payment = 'received';
-                    //         break;
-                    //     case 'CONFIRMED' :
-                    //         $status_payment = 'confirmed';
-                    //         break;    
-                    //     default :
-                    //         $status_payment = 'pending';
-                    //         break;
-                    // }
-                    
-
-                    // Build Strings
-                    $payment_payment_auth        = null;
-                    $payment_date_time           = null;
-                    $payment_status              = 'pending';
-                    $payment_payment_status      = 'pending';
-                    $payment_date_due            = $gateway_payment->expirationDate;
-                    $payment_payment_details     = $gateway_payment->payload;
-                    $payment_payment_doc         = $gateway_payment->encodedImage;
-
-                } elseif ( $order->payment_method == 'boleto' ) {
-                        // Faz uma nova requisição para obter os dados de código debarras e PDF
+                        // Faz uma nova requisição para obter os dados do QRCode e Chave PIX
                         //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
-                        // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
-                        // $gateway_payment = json_decode($gateway_payment);
+                        $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
+                        $gateway_payment = json_decode($gateway_payment);
+
+                        // // Renomeando o valor da string de status do retorno do gateway para o padrão da plataforma.
+                        // switch( $gateway_payment->status ) {
+                        //     case 'PENDING' :
+                        //         $status_payment = 'pending';
+                        //         break;
+                        //     case 'RECEIVED' :
+                        //         $status_payment = 'received';
+                        //         break;
+                        //     case 'CONFIRMED' :
+                        //         $status_payment = 'confirmed';
+                        //         break;    
+                        //     default :
+                        //         $status_payment = 'pending';
+                        //         break;
+                        // }
+                        
 
                         // Build Strings
                         $payment_payment_auth        = null;
                         $payment_date_time           = null;
                         $payment_status              = 'pending';
                         $payment_payment_status      = 'pending';
-                        $payment_date_due            = $gateway_order->dueDate;
-                        $payment_payment_details     = $gateway_order->invoiceUrl;
-                        $payment_payment_doc         = $gateway_order->bankSlipUrl;
+                        $payment_date_due            = $gateway_payment->expirationDate;
+                        $payment_payment_details     = $gateway_payment->payload;
+                        $payment_payment_doc         = $gateway_payment->encodedImage;
 
-                } elseif ( $order->payment_method == 'cartao' ) {
-                        // Faz uma nova requisição para obter os dados de código debarras e PDF
-                        //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
-                        // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
-                        // $gateway_payment = json_decode($gateway_payment);
+                    } elseif ( $order->payment_method == 'boleto' ) {
+                            // Faz uma nova requisição para obter os dados de código debarras e PDF
+                            //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
+                            // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
+                            // $gateway_payment = json_decode($gateway_payment);
 
-                        // Build Strings
-                        $payment_payment_auth        = null;
-                        $payment_date_time           = $gateway_order->confirmedDate;
-                        $payment_status              = $status_order;
-                        $payment_payment_status      = $status_order;
-                        $payment_date_due            = $gateway_order->dueDate;
-                        $payment_payment_details     = json_encode($gateway_order->creditCard);
-                        $payment_payment_doc         = $gateway_order->transactionReceiptUrl;
+                            // Build Strings
+                            $payment_payment_auth        = null;
+                            $payment_date_time           = null;
+                            $payment_status              = 'pending';
+                            $payment_payment_status      = 'pending';
+                            $payment_date_due            = $gateway_order->dueDate;
+                            $payment_payment_details     = $gateway_order->invoiceUrl;
+                            $payment_payment_doc         = $gateway_order->bankSlipUrl;
 
-                }
+                    } elseif ( $order->payment_method == 'cartao' ) {
+                            // Faz uma nova requisição para obter os dados de código debarras e PDF
+                            //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
+                            // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
+                            // $gateway_payment = json_decode($gateway_payment);
+
+                            // Build Strings
+                            $payment_payment_auth        = null;
+                            $payment_date_time           = $gateway_order->confirmedDate;
+                            $payment_status              = $status_order;
+                            $payment_payment_status      = $status_order;
+                            $payment_date_due            = $gateway_order->dueDate;
+                            $payment_payment_details     = json_encode($gateway_order->creditCard);
+                            $payment_payment_doc         = $gateway_order->transactionReceiptUrl;
+
+                    }
 
                     if ( $order->payment_method != 'pix' || $order->payment_method == 'pix' && isset($gateway_payment->success) && $gateway_payment->success ) { // Se for PIX
 
@@ -310,6 +312,17 @@ class CheckoutController extends Controller
                     $status_request = 'success';
 
                 } else {
+
+                    if ( isset( $gateway_order->errors ) ){
+                        //dd($gateway_order->errors);
+
+                        $order_code = $gateway_order->errors[0]->code;
+                        $status_request = 'error';
+                        $trans_code = $gateway_order->errors[0]->description;
+
+                        // Salva o código do erro no banco de dados.
+                        $order->gateway_code  = $gateway_order->errors[0]->code;
+                    } else {
                     //Strings de response, que definem a URL de redirecionamento
                     $order_code = 'error-1001';
                     $status_request = 'error';
@@ -317,6 +330,7 @@ class CheckoutController extends Controller
 
                     // Salva o código do erro no banco de dados.
                     $order->gateway_code  = 'error-1001';
+                    }
                     $order->status  = 'failed';
                     $order->save(); // salva o ID (gateway) do pedido
 
@@ -355,7 +369,7 @@ class CheckoutController extends Controller
     * - Pagamentos
     * Retorna com o resultado da requisição
     */
-    public function request_gateway_api($type="", $verb="", $data="", $param1 = "")
+    public function request_gateway_api($type="", $verb="", $data="", $param1="", $param2="", $param3="", $param4="")
     {
 
         if( $type == 'customer') {
@@ -365,9 +379,52 @@ class CheckoutController extends Controller
         } elseif( $type == 'order' ) {
 
             $url_dir = '/payments';
+
+        if ($param1 == 'cartao' || $param1 == 'CREDIT_CARD') {
+            /*
+            #Personalização dos dados para requisição com checkout utilizando Cartão de crédito
+            */
+            if( !empty($data)) {
+                $data = json_decode($data);
+            }
+
+            $request = $param2; // Campos do formulário
+
+            $data = 
+            '
+            {
+                "billingType": "CREDIT_CARD",
+                "creditCard": {
+                  "holderName": "'.$request->input('cartao_nome').'",
+                  "number": "'.$request->input('cartao_nome').'",
+                  "expiryMonth": "'.$request->input('cartao_nome').'",
+                  "expiryYear": "'.$request->input('cartao_nome').'",
+                  "ccv": "'.$request->input('cartao_nome').'"
+                },
+                "creditCardHolderInfo": {
+                  "name": "John Doe",
+                  "email": "'.$request->input('cartao_nome').'",
+                  "cpfCnpj": "'.$request->input('cartao_nome').'",
+                  "postalCode": "'.$request->input('cartao_nome').'",
+                  "addressNumber": "'.$request->input('cartao_nome').'",
+                  "addressComplement": "'.$request->input('cartao_nome').'",
+                  "phone": "'.$request->input('cartao_nome').'"
+                },
+                "customer": "'.$param3.'",
+                "value": '.$data->value.',
+                "dueDate": "'.$data->dueDate.'",
+                "description": "'.$data->description.'",
+                "externalReference": "'.$data->externalReference.'",
+                "remoteIp": "'.$param4.'"
+              }
+              ';
             
+        }
+        
         } elseif( $type == 'payment' ) {
-            
+            /*
+            #Personalização dos dados para requisição com checkout utilizando PIX
+            */
             switch($param1) {
                 case 'PIX' :
                     $url_complement = '/pixQrCode';
@@ -383,7 +440,7 @@ class CheckoutController extends Controller
             
         }
         if ($type == "POST") {
-        
+            // Requisição principal para criação do pedido no gateway.
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -435,11 +492,189 @@ class CheckoutController extends Controller
         }
     }
 
+
+    /**
+     * Parametriza a view adequada, a partir da resposta da requisição à API do gateway.
+     * Se o status for de sucess, limpa as seções "shoppingCart" e "cart_total_price" e exibe a view de obrigado.
+     * Se o status de de error, repete a tela de checkout, porém com todos os dados salvos.
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function processing( Request $request )
+    {
+        // Captura os códigos de erro expressados na URL.
+        $request_order_code =  $request->order_code;
+        $request_status_checkout_request =  $request->status_checkout_request;
+        $request_trans_code =  $request->trans_code;
+
+        //recria as seções do carrinho
+        $shoppingCart = session( 'shoppingCart' );
+        $cart_total_price = session( 'cart_total_price' );
+        
+        // Construnido a mensagem de erro
+        $this->error_library_notifiation($request_order_code);      
+        $get_checkout_request_details = $request_order_code.'|'.$request_trans_code; // simulacao
+        //==============
+        $status_checkout_request = $request->status_checkout_request ? $request->status_checkout_request : '';
+        $order_code = $request->order_code ? $request->order_code : '';
+        $trans_code = $request->trans_code ? $request->trans_code : '';
+        //$get_checkout_request_details = $request->checkout_request_details ? $request->checkout_request_details : '';
+        //==============
+
+        $get_checkout_request_details = explode('|', $get_checkout_request_details);
+        $checkout_request_details = array(
+            'code' => $get_checkout_request_details[0],
+            'msg' => $get_checkout_request_details[1]
+        );
+
+        if ( $status_checkout_request === 'success') {
+            session('shoppingCart', []);
+            session('cart_total_price', null);
+
+            $get_order = new Order();
+            $get_order_details = $get_order->item_details($order_code);
+            
+                if($get_order_details) {
+
+                    $get_order_details = $get_order_details[0];
+
+                    $get_customer = new Customer();
+                    $get_customer_details = $get_customer->item_details($get_order_details->customer_id);
+                    
+                    $get_payment = new Payment();
+                    $get_payment_details = $get_payment->item_details($get_order_details->id);
+                    $get_payment_details = $get_payment_details[0];
+
+                    if( $get_customer_details ) {
+                        $get_customer_details = $get_customer_details[0];
+                        
+
+                        return view('checkout-obrigado', compact( 'order_code', 'get_order_details', 'get_customer_details', 'get_payment_details' ));
+                    } else {
+                        return redirect('/checkout');
+                    }
+                } else {
+                    return redirect('/checkout');
+                }
+            
+        } else {
+            if( !empty($order_code)) {
+                $get_order = new Order();
+                $get_order_details = $get_order->item_details($order_code);
+
+                if($get_order_details) {
+
+                    $get_order_details = $get_order_details[0];
+
+                    $get_customer = new Customer();
+                    $get_customer_details = $get_customer->item_details($get_order_details->customer_id);
+                    if( $get_customer_details ) {
+                        $get_customer_details = $get_customer_details[0];
+                        return view('checkout', compact('shoppingCart', 'cart_total_price', 'order_code', 'get_order_details', 'get_customer_details', 'checkout_request_details' ));
+                    } else {
+                        return redirect('/checkout');
+                    }
+                }
+                else {
+                    return redirect('/checkout');
+                }
+                
+            }
+            else {
+                return redirect('/checkout');
+            }
+            
+        }
+    }
+
+    /*
+    * Banco de Erros
+    */
+    public function error_library_notifiation( $code = "", $value="" )
+    {
+
+        $error_library_arr = array(
+            'error-1001' => 'Transação não autorizada. Verifique os dados do cartão de crédito e tente novamente.',
+            'error-1002' => 'Erro ao tentar cadastrar o usuário. Por favor, tente novamente ou solicite um suporte.',
+            'invalid_action' => $value,
+        );
+
+        if( array_key_exists($code, $error_library_arr)) { // Só retorna com valor se o erro existir no banco de erros.
+
+            return $error_library_arr[$code];
+
+        } else{
+
+            return null;
+        }
+
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreCheckoutRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(StoreCheckoutRequest $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Checkout  $checkout
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Checkout $checkout)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Checkout  $checkout
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Checkout $checkout)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateCheckoutRequest  $request
+     * @param  \App\Models\Checkout  $checkout
+     * @return \Illuminate\Http\Response
+     */
+    public function update(UpdateCheckoutRequest $request, Checkout $checkout)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Checkout  $checkout
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Checkout $checkout)
+    {
+        //
+    }
+
     /** DEBUG
      *  Função criada para simular, testar, debugar as requisições - emulando uma consulta a API do gateway
      */
-    public function request_gateway_api_debug($type="", $verb="", $data="", $param1 = "")
+    public function request_gateway_api_debug($type="", $verb="", $data="", $param1 = "", $param2 = "", $param3 = "", $param4 = "")
     {  
+
+        if( !empty($data)) {
+            $data = json_decode($data);
+        }
         
         if ( $type == "customer" && $verb == 'POST' ) {
           // Simulação de response do Cadastro de cliente  
@@ -563,8 +798,48 @@ class CheckoutController extends Controller
 
             } elseif( $param1  == 'CREDIT_CARD' || $param1  == 'cartao' ) {
 
+                if ($param1 == 'cartao' || $param1 == 'CREDIT_CARD') {
+
+                    $request = $param2; // Campos do formulário
+
+                    $data = 
+                    '
+                    {
+                        "billingType": "CREDIT_CARD",
+                        "creditCard": {
+                          "holderName": "'.$request->input('cartao_nome').'",
+                          "number": "'.$request->input('cartao_nome').'",
+                          "expiryMonth": "'.$request->input('cartao_nome').'",
+                          "expiryYear": "'.$request->input('cartao_nome').'",
+                          "ccv": "'.$request->input('cartao_nome').'"
+                        },
+                        "creditCardHolderInfo": {
+                          "name": "John Doe",
+                          "email": "'.$request->input('cartao_nome').'",
+                          "cpfCnpj": "'.$request->input('cartao_nome').'",
+                          "postalCode": "'.$request->input('cartao_nome').'",
+                          "addressNumber": "'.$request->input('cartao_nome').'",
+                          "addressComplement": "'.$request->input('cartao_nome').'",
+                          "phone": "'.$request->input('cartao_nome').'"
+                        },
+                        "customer": "'.$param3.'",
+                        "value": '.$data->value.',
+                        "dueDate": "'.$data->dueDate.'",
+                        "description": "'.$data->description.'",
+                        "externalReference": "'.$data->externalReference.'",
+                        "remoteIp": "'.$param4.'"
+                      }
+                      ';
+
+                    //   var_dump($data);
+                    //   die;
+
+                }
+
+                
+
                 // Se a cobraça for via cartão
-                return '
+                $return_success =  '
                 {
                     "object": "payment",
                     "id": "pay_4t9669bm23qod0wn",
@@ -609,6 +884,19 @@ class CheckoutController extends Controller
                   }
                 ';
 
+                $return_error = '
+                {
+                    "errors": [
+                      {
+                        "code": "invalid_action",
+                        "description": "Transação não autorizada. Verifique os dados do cartão de crédito e tente novamente."
+                      }
+                    ]
+                  }
+                ';
+
+            return $return_success;
+
             }
 
         } elseif ( $type == "order" && $verb == 'GET' ) {
@@ -631,157 +919,6 @@ class CheckoutController extends Controller
             }
 
         }
-    }
-
-    /**
-     * Parametriza a view adequada, a partir da resposta da requisição à API do gateway.
-     * Se o status for de sucess, limpa as seções "shoppingCart" e "cart_total_price" e exibe a view de obrigado.
-     * Se o status de de error, repete a tela de checkout, porém com todos os dados salvos.
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function processing( Request $request )
-    {
-        $shoppingCart = session( 'shoppingCart' );
-        $cart_total_price = session( 'cart_total_price' );
-        
-        //==============
-        // A única informação a ser considerada na URL para a consulta no DB é o ORDER_COD e o TRANS_CODE onde a partir deles, será feita uma busca no DB para que aí sim sejam recuperados os dados detalhes do erro. 
-        //==============
-        $get_checkout_request_details = '111|Teste da mensagem padrão'; // simulacao
-        //==============
-        $status_checkout_request = $request->status_checkout_request ? $request->status_checkout_request : '';
-        $order_code = $request->order_code ? $request->order_code : '';
-        $trans_code = $request->trans_code ? $request->trans_code : '';
-        //$get_checkout_request_details = $request->checkout_request_details ? $request->checkout_request_details : '';
-        //==============
-
-        $get_checkout_request_details = explode('|', $get_checkout_request_details);
-        $checkout_request_details = array(
-            'code' => $get_checkout_request_details[0],
-            'msg' => $get_checkout_request_details[1]
-        );
-
-        if ( $status_checkout_request === 'success') {
-            session('shoppingCart', []);
-            session('cart_total_price', null);
-
-            $get_order = new Order();
-            $get_order_details = $get_order->item_details($order_code);
-            
-                if($get_order_details) {
-
-                    $get_order_details = $get_order_details[0];
-
-                    $get_customer = new Customer();
-                    $get_customer_details = $get_customer->item_details($get_order_details->customer_id);
-                    
-                    $get_payment = new Payment();
-                    $get_payment_details = $get_payment->item_details($get_order_details->id);
-                    $get_payment_details = $get_payment_details[0];
-
-                    if( $get_customer_details ) {
-                        $get_customer_details = $get_customer_details[0];
-                        
-
-                        return view('checkout-obrigado', compact( 'order_code', 'get_order_details', 'get_customer_details', 'get_payment_details' ));
-                    } else {
-                        return redirect('/checkout');
-                    }
-                } else {
-                    return redirect('/checkout');
-                }
-            
-        } else {
-            if( !empty($order_code)) {
-                $get_order = new Order();
-                $get_order_details = $get_order->item_details($order_code);
-
-                if($get_order_details) {
-
-                    $get_order_details = $get_order_details[0];
-
-                    $get_customer = new Customer();
-                    $get_customer_details = $get_customer->item_details($get_order_details->customer_id);
-                    if( $get_customer_details ) {
-                        $get_customer_details = $get_customer_details[0];
-                        return view('checkout', compact('shoppingCart', 'cart_total_price', 'order_code', 'get_order_details', 'get_customer_details', 'checkout_request_details' ));
-                    } else {
-                        return redirect('/checkout');
-                    }
-                }
-                else {
-                    return redirect('/checkout');
-                }
-                
-            }
-            else {
-                return redirect('/checkout');
-            }
-            
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreCheckoutRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreCheckoutRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Checkout  $checkout
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Checkout $checkout)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Checkout  $checkout
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Checkout $checkout)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateCheckoutRequest  $request
-     * @param  \App\Models\Checkout  $checkout
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateCheckoutRequest $request, Checkout $checkout)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Checkout  $checkout
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Checkout $checkout)
-    {
-        //
-    }
-
-    public function auth_asaas_api(Checkout $checkout)
-    {
-        //
-        return true;
     }
 
 }

@@ -25,6 +25,7 @@ class CreateOrdersTable extends Migration
             $table->string('payment_method',255)->nullable();
             $table->text('payment_details')->nullable();
             $table->string('checkout_status',255);
+            $table->string('ip_user',255)->nullable();
         });
     }
 
