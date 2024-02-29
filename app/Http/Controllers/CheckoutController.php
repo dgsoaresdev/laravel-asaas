@@ -191,89 +191,98 @@ class CheckoutController extends Controller
                     "observations": "Origem: Checkout Laravel"
                 }
                 ';
-                
-                // Request create customer in gateway API and get gateway customer ID.
+                /*========================
+                # CADATSTRO NOVO CLIENTE
+                Request create customer in gateway API and get gateway customer ID.
+                ==========================
+                 */
                 $gateway_customer = $this->request_gateway_api("customer", "POST", $CURLOPT_POSTFIELDS_customer, ""); // ($type, $verb, $data, $param1) // PROD
                // $gateway_customer = $this->request_gateway_api_debug("customer", "POST", $CURLOPT_POSTFIELDS_customer, ""); // DEBUG
-                $gateway_customer = json_decode( $gateway_customer );                
+                $gateway_customer = json_decode( $gateway_customer );
+                
+                //dd($gateway_customer->id);
 
                 if ( isset( $gateway_customer->id ) ){
                     $customer->gateway_code  = $gateway_customer->id;
                     $customer->save(); // salva o ID (gateway) do cliente
+                    $customer_id = $customer->id;
                 } 
                 // Save gateway customer ID in database
-            }
-
-            /*==================
-            #Create ORDER
-            1. Registra o pedido no banco de dados
-            2. Faz uma requisição à API do gateway, criando um novo pedido
-            3. Recupera o ID do novo pedido criado no gateway
-            4. Salva o ID do novo pedido no banco de dados dentro da coluna "gateway_code".
-            //==================
-            */
-            $order = new Order();
-
-            if ( $request->input('payment_method') == 'pix') {
                 
-                $order_status = 'draft';
-            } else {
-                $order_status = 'pending';
-             }
+            // }
 
-            $order->gateway_code        = '';
-            $order->customer_id         = $customer_id;
-            $order->line_items          = json_encode( $shoppingCart );
-            $order->amout               = $cart_total_price;
-            $order->status              = $order_status;
-            $order->payment_status      = 'pending';
-            $order->payment_method      = $request->input('payment_method');
-            $order->payment_details     = '';
-            $order->checkout_status     = 'open';
-            $order->ip_user             = $get_ip_user;    
+                /*==================
+                #Create ORDER
+                1. Registra o pedido no banco de dados
+                2. Faz uma requisição à API do gateway, criando um novo pedido
+                3. Recupera o ID do novo pedido criado no gateway
+                4. Salva o ID do novo pedido no banco de dados dentro da coluna "gateway_code".
+                //==================
+                */
+                $order = new Order();
 
-            $CurrentDate = date('Y-m-d');
-            // Renomeando o valor da string do método de pagamento para o padrão do gateway.
-            switch( $order->payment_method ) {
-                case 'cartao' :
-                    $order_payment_method = 'CREDIT_CARD';
-                    $due_date = date('Y-m-d', strtotime( $CurrentDate. ' + 2 days' ) );
-                    break;
+                if ( $request->input('payment_method') == 'pix') {
+                    
+                    $order_status = 'draft';
+                } else {
+                    $order_status = 'pending';
+                }
 
-                case 'pix' :
-                    $order_payment_method = 'PIX';
-                    $due_date = date('Y-m-d', strtotime( $CurrentDate. ' + 2 days' ) );
-                    break;
+                $order->gateway_code        = '';
+                $order->customer_id         = $customer_id;
+                $order->line_items          = json_encode( $shoppingCart );
+                $order->amout               = $cart_total_price;
+                $order->status              = $order_status;
+                $order->payment_status      = 'pending';
+                $order->payment_method      = $request->input('payment_method');
+                $order->payment_details     = '';
+                $order->checkout_status     = 'open';
+                $order->ip_user             = $get_ip_user;    
 
-                case 'boleto' :
-                    $order_payment_method = 'BOLETO';
-                    $due_date = date('Y-m-d', strtotime( $CurrentDate. ' + 2 days' ) );
-                    break;
-            }
+                $CurrentDate = date('Y-m-d');
+                // Renomeando o valor da string do método de pagamento para o padrão do gateway.
+                switch( $order->payment_method ) {
+                    case 'cartao' :
+                        $order_payment_method = 'CREDIT_CARD';
+                        $due_date = date('Y-m-d', strtotime( $CurrentDate. ' + 2 days' ) );
+                        break;
 
-            $order->save();
+                    case 'pix' :
+                        $order_payment_method = 'PIX';
+                        $due_date = date('Y-m-d', strtotime( $CurrentDate. ' + 2 days' ) );
+                        break;
 
-            $order_id = $order->id;
+                    case 'boleto' :
+                        $order_payment_method = 'BOLETO';
+                        $due_date = date('Y-m-d', strtotime( $CurrentDate. ' + 2 days' ) );
+                        break;
+                }
 
-            if ($customer_id > 0) {
+                $order->save();
+
+                $order_id = $order->id;
+
+                //if ($customer_id > 0) {
                 /*
                     Construindo o Array Json que será enviado na requisição de cadastro de novo pedido via API do Gateway.
                 */
                 $CURLOPT_POSTFIELDS_order = '
                 {
-                    "customer": "'.$customer_id.'",
                     "billingType": "'.$order_payment_method.'",
+                    "customer": "'.$gateway_customer->id.'",
                     "dueDate": "'.$due_date.'",
                     "value": '.$order->amout.',
                     "description": "Pedido: '.$order_id.'",
                     "externalReference": "'.$order_id.'"
                   }
-                ';               
+                ';        
                 
                 // Request create order in gateway API and get gateway customer ID.
-                $gateway_order = $this->request_gateway_api("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // ($type, $verb, $data, $param1) // PROD
+                $gateway_order = $this->request_gateway_api("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // // PROD
                 //$gateway_order = $this->request_gateway_api_debug("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // DEBUG
+                                
                 $gateway_order = json_decode( $gateway_order );   
+                
 
                 if ( isset( $gateway_order->id ) ){
 
@@ -306,21 +315,7 @@ class CheckoutController extends Controller
                         //$gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
                         $gateway_payment = json_decode($gateway_payment);
 
-                        // // Renomeando o valor da string de status do retorno do gateway para o padrão da plataforma.
-                        // switch( $gateway_payment->status ) {
-                        //     case 'PENDING' :
-                        //         $status_payment = 'pending';
-                        //         break;
-                        //     case 'RECEIVED' :
-                        //         $status_payment = 'received';
-                        //         break;
-                        //     case 'CONFIRMED' :
-                        //         $status_payment = 'confirmed';
-                        //         break;    
-                        //     default :
-                        //         $status_payment = 'pending';
-                        //         break;
-                        // }
+                        
                         
 
                         // Build Strings
@@ -333,10 +328,7 @@ class CheckoutController extends Controller
                         $payment_payment_doc         = $gateway_payment->encodedImage;
 
                     } elseif ( $order->payment_method == 'boleto' ) {
-                            // Faz uma nova requisição para obter os dados de código debarras e PDF
-                            //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
-                            // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
-                            // $gateway_payment = json_decode($gateway_payment);
+                            
 
                             // Build Strings
                             $payment_payment_auth        = null;
@@ -348,10 +340,7 @@ class CheckoutController extends Controller
                             $payment_payment_doc         = $gateway_order->bankSlipUrl;
 
                     } elseif ( $order->payment_method == 'cartao' ) {
-                            // Faz uma nova requisição para obter os dados de código debarras e PDF
-                            //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
-                            // $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
-                            // $gateway_payment = json_decode($gateway_payment);
+                            
 
                             // Build Strings
                             $payment_payment_auth        = null;
@@ -386,14 +375,6 @@ class CheckoutController extends Controller
                     } 
                 
                     
-                    
-
-                    // Atualizando o Status do pedido
-                    // if( $request->input('payment_method') == 'cartao' ) {
-                    //     $order_status    = $gateway_payment->status;
-                    // } else {
-                    //     $order->status   = 'pending';
-                    // }
 
                     // Atualizando o Status do pedido
                     $order->status              = $status_order;
@@ -552,6 +533,8 @@ class CheckoutController extends Controller
     public function request_gateway_api($type="", $verb="", $data="", $param1="", $param2="", $param3="", $param4="")
     {
 
+        //$gateway_order = $this->request_gateway_api("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user);
+        
         if( $type == 'customer') {
 
             $url_dir = '/customers';
@@ -560,46 +543,77 @@ class CheckoutController extends Controller
 
             $url_dir = '/payments';
 
-        if ($param1 == 'cartao' || $param1 == 'CREDIT_CARD') {
-            /*
-            #Personalização dos dados para requisição com checkout utilizando Cartão de crédito
-            */
-            if( !empty($data)) {
-                $data = json_decode($data);
+           
+
+            if ($param1 == 'cartao' || $param1 == 'CREDIT_CARD') {
+                /*
+                #Personalização dos dados para requisição com checkout utilizando Cartão de crédito
+                */
+                if( !empty($data)) {
+                    $data = json_decode($data);
+                }
+
+                $request = $param2; // Campos do formulário
+                // $data =
+                // '
+                // {
+                //     "billingType": "CREDIT_CARD",
+                //     "creditCard": {
+                //       "holderName": "john doe",
+                //       "number": "5162306219378829",
+                //       "expiryMonth": "05",
+                //       "expiryYear": "2025",
+                //       "ccv": "318"
+                //     },
+                //     "creditCardHolderInfo": {
+                //       "name": "John Doe",
+                //       "email": "john.doe@asaas.com.br",
+                //       "cpfCnpj": "24971563792",
+                //       "postalCode": "89223-005",
+                //       "addressNumber": "277",
+                //       "phone": "4738010919"
+                //     },
+                //     "customer": "cus_000005899309",
+                //     "value": 100,
+                //     "dueDate": "2024-03-05",
+                //     "description": "Pedido 056984",
+                //     "externalReference": "056984",
+                //     "remoteIp": "45.229.214.85"
+                //   }
+                // '; 
+
+                $data = 
+                '
+                {
+                    "billingType": "CREDIT_CARD",
+                    "creditCard": {
+                    "holderName": "'.$request->input('cartao_nome').'",
+                    "number": "'.$request->input('cartao_numero').'",
+                    "expiryMonth": "'.$request->input('cartao_data_mes').'",
+                    "expiryYear": "'.$request->input('cartao_data_ano').'",
+                    "ccv": "'.$request->input('cartao_codigo').'"
+                    },
+                    "creditCardHolderInfo": {
+                    "name": "John Doe",
+                    "email": "'.$request->input('email').'",
+                    "cpfCnpj": "'.$request->input('cpfCnpj').'",
+                    "postalCode": "'.$request->input('postalCode').'",
+                    "addressNumber": "'.$request->input('addressNumber').'",
+                    "addressComplement": "'.$request->input('complement').'",
+                    "phone": "'.$request->input('mobilePhone').'"
+                    },
+                    "customer": "'.$param3.'",
+                    "value": '.$data->value.',
+                    "dueDate": "'.$data->dueDate.'",
+                    "description": "'.$data->description.'",
+                    "externalReference": "'.$data->externalReference.'",
+                    "remoteIp": "'.$param4.'"
+                }
+                
+                ';
+                
             }
 
-            $request = $param2; // Campos do formulário
-
-            $data = 
-            '
-            {
-                "billingType": "CREDIT_CARD",
-                "creditCard": {
-                  "holderName": "'.$request->input('cartao_nome').'",
-                  "number": "'.$request->input('cartao_nome').'",
-                  "expiryMonth": "'.$request->input('cartao_nome').'",
-                  "expiryYear": "'.$request->input('cartao_nome').'",
-                  "ccv": "'.$request->input('cartao_nome').'"
-                },
-                "creditCardHolderInfo": {
-                  "name": "John Doe",
-                  "email": "'.$request->input('cartao_nome').'",
-                  "cpfCnpj": "'.$request->input('cartao_nome').'",
-                  "postalCode": "'.$request->input('cartao_nome').'",
-                  "addressNumber": "'.$request->input('cartao_nome').'",
-                  "addressComplement": "'.$request->input('cartao_nome').'",
-                  "phone": "'.$request->input('cartao_nome').'"
-                },
-                "customer": "'.$param3.'",
-                "value": '.$data->value.',
-                "dueDate": "'.$data->dueDate.'",
-                "description": "'.$data->description.'",
-                "externalReference": "'.$data->externalReference.'",
-                "remoteIp": "'.$param4.'"
-              }
-              ';
-            
-        }
         
         } elseif( $type == 'payment' ) {
             /*
@@ -619,7 +633,7 @@ class CheckoutController extends Controller
             $param1 = '';
             
         }
-        if ($type == "POST") {
+        if ($verb == "POST") {
             // Requisição principal para criação do pedido no gateway.
             $curl = curl_init();
 
@@ -644,7 +658,7 @@ class CheckoutController extends Controller
             curl_close($curl);
             return $response;
         
-        } else if ($type == "GET") {
+        } else if ($verb == "GET") {
 
             
             $curl = curl_init();
@@ -784,6 +798,8 @@ class CheckoutController extends Controller
             'error-1008' => 'Por favor, solicite um suporte.',
             'error-1009' => 'Por favor, digite um CPF válido.',
             'invalid_action' => $value,
+            'invalid_customer' => $value,
+            'invalid_creditCard'=>$value
         );
 
         if( array_key_exists($code, $error_library_arr)) { // Só retorna com valor se o erro existir no banco de erros.
