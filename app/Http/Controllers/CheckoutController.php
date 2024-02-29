@@ -466,40 +466,7 @@ class CheckoutController extends Controller
                             return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
                         }
                     }
-                    //====
-                    // Telefone
-                    //====
-                    // if ( !$this->validaTelefone(  $customer_telefone ) ) {
-                
-                    //     $order_code = 'error-1004';
-                    //     $status_request = 'error';
-                    //     $trans_code = 'Por favor, digite um número de telefone válido';
-
-                    //     $order->status  = 'failed';
-                    //     $order->gateway_code  = 'error-1004';
-                    //     $order->save(); // salva o ID (gateway) do pedido
-                             
-                    //     // Redionrecionamento construído a partor dos responses acima.
-                    //     return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
-                    // }
-
-                    //====
-                    // Telefone Celular
-                    //====
-
-                    // if ( !$this->validaTelefone(  $customer_mobilePhone ) ) {
-                
-                    //     $order_code = 'error-1005';
-                    //     $status_request = 'error';
-                    //     $trans_code = 'Por favor, digite um número de telefone celular válido';
-
-                    //     $order->status  = 'failed';
-                    //     $order->gateway_code  = 'error-1005';
-                    //     $order->save(); // salva o ID (gateway) do pedido
-                             
-                    //     // Redionrecionamento construído a partor dos responses acima.
-                    //     return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
-                    // }
+                  
 
                     //====
                     // CEP
@@ -809,11 +776,13 @@ class CheckoutController extends Controller
         $error_library_arr = array(
             'error-1001' => 'Transação não autorizada. Verifique os dados do cartão de crédito e tente novamente.',
             'error-1002' => 'Erro ao tentar cadastrar o usuário. Por favor, tente novamente ou solicite um suporte.',
-            'error-1003' => 'Por favor, digite um CPF válido',
-            'error-1004' => 'Por favor, digite um e-mail válido',
-            'error-1005' => 'Por favor, digite um CEP válido',
-            'error-1006' => 'Por favor, digite um número de celular válido',
-            'error-1007' => 'Por favor, digite um número de telefone válido',
+            'error-1003' => 'Por favor, digite um CPF válido.',
+            'error-1004' => 'Por favor, digite um e-mail válido.',
+            'error-1005' => 'Por favor, digite um CEP válido.',
+            'error-1006' => 'Por favor, digite um número de celular válido.',
+            'error-1007' => 'Por favor, digite um CPF válido.',
+            'error-1008' => 'Por favor, solicite um suporte.',
+            'error-1009' => 'Por favor, digite um CPF válido.',
             'invalid_action' => $value,
         );
 
@@ -892,9 +861,7 @@ class CheckoutController extends Controller
 
     public function RemoveSpecialChar($str){
       
-        // Using preg_replace() function 
-        // to replace the word 
-        //$res = preg_replace('/[0-9\@\.\;\" "]+/', '',$str);
+        
         $res = str_ireplace( array( '\'', '"', ',' , ';', '<', '>', '.', '-', ' ', '(', ')' ), '', $str);
         // Returning the result 
         return $res;
@@ -903,7 +870,6 @@ class CheckoutController extends Controller
     public function validaCPF($cpf = "") {
  
         // Extrai somente os números
-        //$cpf = '00622707370';
         $cpf = preg_replace( '/[^0-9]/is', '', $cpf );
          
         // Verifica se foi informado todos os digitos corretamente
@@ -929,19 +895,6 @@ class CheckoutController extends Controller
         return true;
     }
 
-    // public function validaTelefone($telefone){
-        
-    //     $telefone= trim(str_replace('/', '', str_replace(' ', '', str_replace('-', '', str_replace(')', '', str_replace('(', '', $telefone))))));
-    
-    //     $regexTelefone = "^[0-9]{11}$";
-    
-    //     //$regexCel = '/[0-9]{2}[6789][0-9]{3,4}[0-9]{4}/'; // Regex para validar somente celular
-    //     if (preg_match($regexTelefone, $telefone)) {
-    //         return true;
-    //     }else{
-    //         return false;
-    //     }
-    // }
 
     public function validaCEP($CEPNumber){
         
@@ -996,180 +949,6 @@ class CheckoutController extends Controller
         }
         return $data;
     }
-
-
-//     public function validacao_de_campos($field_type="", $field_value = "")
-//     {
-
-//             $verify_data_begins = array();
-//             //=======
-//             // Valida CPF
-//             // Retira os carecteres especiais do CPF
-//             $vat_number = $this->crud_model->RemoveSpecialChar( html_escape( $get_data_user['vat_number'] ) );
-//             // Checa se o número do CPF é válido e retorna com erro, caso não seja
-//             if ( !$this->crud_model->validaCPF(  $vat_number ) ) {
-//                 $verify_data_begins_cpf = array(
-//                     'referral' => 'vat_number',
-//                     'status' => 'error',            
-//                     'response' => get_phrase('check_your_vat_number_in_personal_data')
-//                 );
-//                 $get_data_user['vat_number'] = $vat_number;        
-//             } else {
-//                 // se o CPF for válido, atualiza o dado com o dado limpo de caracteres especiais.
-//                 $verify_data_begins_cpf = array(
-//                     'referral' => 'vat_number',
-//                     'status' => 'success',            
-//                     'response' => $vat_number
-//                 ); 
-                
-//             }
-            
-
-//             array_push($verify_data_begins,$verify_data_begins_cpf);
-
-
-//             //=======
-//             // Valida Número do Cartão de crédito
-//             if ($payment_type == 'credit_card') {
-//             $payment_data_ = (array)json_decode($payment_data);
-//             $payment_data_new = array();
-//             foreach( $payment_data_ as $key => $value){
-//                     $payment_data_new = array_merge($payment_data_new,(array)$value);
-//             }
-            
-//             // Retira caracteres especiais
-//             $card_number = $this->crud_model->RemoveSpecialChar( html_escape( $payment_data_new['card_number'] ) );
-
-//                 if (!$this->crud_model->validationCreditCard($card_number) ) {
-//                 $verify_data_begins_credit_card = array(
-//                     'referral' => 'credit_card_number',
-//                     'status' => 'error',            
-//                     'response' => get_phrase('insert_a_valid_card_number'),
-//                 );
-//             } else {
-//                 $verify_data_begins_credit_card = array(
-//                     'referral' => 'credit_card_number',
-//                     'status' => 'success',          
-//                     'response' => null,
-//                 );
-//             }
-
-//             array_push($verify_data_begins,$verify_data_begins_credit_card);
-//             }
-            
-//             //=========================
-//             // Valida Telefone
-//             //=========================
-//             // Retira os carecteres especiais
-//             $phonenumber  = $this->crud_model->RemoveSpecialChar( html_escape( $get_data_user['phonenumber'] ) );
-//             $get_data_user['phonenumber'] = $phonenumber;
-//             //===========
-//             // Valida CEP
-//             //==========
-//             // Retira os carecteres especiais
-//             $zipcode = $this->crud_model->RemoveSpecialChar( html_escape( $get_data_user['zipcode'] ) );
-//             $get_data_user['zipcode'] = $zipcode;
-                    
-//             //=========================
-//             // Valida E-mail
-//             //=========================
-//             if ( $this->session->userdata('user_login') == 1 || $this->session->userdata('admin_login') == 1 ) {
-//                 $user_logged = true;
-//                 $get_user_details = $this->user_model->get_user( $this->session->userdata('user_id') )->row_array();
-//             } else {
-//                 $user_logged = false;
-//             }
-            
-//             // Valida e-mail e verifica se já está cadastrado
-//             $validity = $this->user_model->check_duplication('on_create', $get_data_user['email']);        
-//             if ( $validity === true ) {
-
-//                 $verify_data_begins_email = array(
-//                     'referral' => 'email',
-//                     'status' => 'success',            
-//                     'response' => $get_data_user['email']
-//                 ); 
-
-//             } elseif ( $validity === false && $user_logged && $get_user_details['email'] === $get_data_user['email'] ) {
-
-//                 $verify_data_begins_email = array(
-//                     'referral' => 'email',
-//                     'status' => 'success',            
-//                     'response' => $get_data_user['email']
-//                 ); 
-
-//             } elseif ( $validity === false && !$user_logged ) { 
-//                 $verify_data_begins_email = array(
-//                     'referral' => 'email',
-//                     'status' => 'error',            
-//                     'response' => get_phrase('you_have_already_registered')
-//                 ); 
-//             }
-            
-
-//             array_push($verify_data_begins,$verify_data_begins_email);
-
-//             //$verify_data_begins = array_merge($verify_data_begins_cpf, $verify_data_begins_email);
-
-//             //var_dump($verify_data_begins);
-
-//             foreach($verify_data_begins as $verify_data_begins_item) {
-
-//                 if ( in_array('error', $verify_data_begins_item) ) {
-//                 $verify_error = true;
-//                 $referral_error = $verify_data_begins_item['referral'];
-//                 $response_error = $verify_data_begins_item['response'];
-//                 }
-//             }
-
-//             if ($verify_error) {
-//                 $verify_error_status = 'error';
-//                 $verify_error_response = $response_error;
-//                 $verify_error_referral = $referral_error;
-//             } else {
-//                 $verify_error_status = 'success';
-//                 $verify_error_response = NULL;
-//                 $verify_error_referral = NULL;
-//             }
-
-//             // Continue, if all data this is sanialyzered.
-//             // if ( $verify_error_status === 'success' ) {
-//             //     $sanialyze_status = 'success';
-//             //     $sanialyze_response = NULL;
-//             // } else {
-//             //     $sanialyze_status = 'error';
-//             //     $sanialyze_response = $verify_error_response;
-//             // }
-
-
-                
-
-//             //=============== end Samialyze
-
-            
-//             //$arr_items = $this->input->post('arr_items');
-//             // Sanialyze data
-//             $page_data['sanialyze_status'] = $verify_error_status;
-//             $page_data['verify_error_response'] = $verify_error_response;
-//             $page_data['verify_error_referral'] = $verify_error_referral;
-//             // Data past to load view
-//             $page_data['payment_method'] = $payment_type;
-//             $page_data['payment_data'] = $payment_data;
-//             $page_data['payment_user'] = $payment_user;
-//             $page_data['cart_data'] = $cart_data;
-//             $page_data['cart_type'] = $cart_type;
-//             $page_data['cart_amount'] = $cart_amount;
-//             $page_data['coupon'] = $coupon;
-            
-//             if ( $verify_error_status == 'error') {
-//             echo 'error|' . $verify_error_referral;
-//             } else {
-//                 $this->load->view('payment/payment_api_response', $page_data);
-//             }
-//         }
-
-// }
-
 
 
 

@@ -25,9 +25,6 @@
                    Bandeira: <strong>{{ $payment_details_get->creditCardBrand}}</strong>
                   </li>
                   <li class="GuidePayment-items-item">
-                   Bandeira: <strong>{{ $payment_details_get->creditCardBrand}}</strong>
-                  </li>
-                  <li class="GuidePayment-items-item">
                    Data do pagamento: <strong> {{ date( 'd/m/Y', strtotime( $get_payment_details->payment_date_time ) ) }} </strong>
                   </li>
                   
