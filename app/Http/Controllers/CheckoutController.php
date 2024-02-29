@@ -193,8 +193,8 @@ class CheckoutController extends Controller
                 ';
                 
                 // Request create customer in gateway API and get gateway customer ID.
-                //$gateway_customer = $this->request_gateway_api("customer", "POST", $CURLOPT_POSTFIELDS_customer, ""); // ($type, $verb, $data, $param1) // PROD
-                $gateway_customer = $this->request_gateway_api_debug("customer", "POST", $CURLOPT_POSTFIELDS_customer, ""); // DEBUG
+                $gateway_customer = $this->request_gateway_api("customer", "POST", $CURLOPT_POSTFIELDS_customer, ""); // ($type, $verb, $data, $param1) // PROD
+               // $gateway_customer = $this->request_gateway_api_debug("customer", "POST", $CURLOPT_POSTFIELDS_customer, ""); // DEBUG
                 $gateway_customer = json_decode( $gateway_customer );                
 
                 if ( isset( $gateway_customer->id ) ){
@@ -271,8 +271,8 @@ class CheckoutController extends Controller
                 ';               
                 
                 // Request create order in gateway API and get gateway customer ID.
-                //$gateway_order = $this->request_gateway_api("customer", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // ($type, $verb, $data, $param1) // PROD
-                $gateway_order = $this->request_gateway_api_debug("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // DEBUG
+                $gateway_order = $this->request_gateway_api("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // ($type, $verb, $data, $param1) // PROD
+                //$gateway_order = $this->request_gateway_api_debug("order", "POST", $CURLOPT_POSTFIELDS_order, $order_payment_method, $request, $gateway_customer->id, $get_ip_user); // DEBUG
                 $gateway_order = json_decode( $gateway_order );   
 
                 if ( isset( $gateway_order->id ) ){
@@ -302,8 +302,8 @@ class CheckoutController extends Controller
                     if ( $order->payment_method == 'pix' ) {
 
                         // Faz uma nova requisição para obter os dados do QRCode e Chave PIX
-                        //$gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
-                        $gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
+                        $gateway_payment = $this->request_gateway_api("payment", "GET", $gateway_order->id, $order_payment_method); // PROD
+                        //$gateway_payment = $this->request_gateway_api_debug("payment", "GET", $gateway_order->id, $order_payment_method); // DEBUG
                         $gateway_payment = json_decode($gateway_payment);
 
                         // // Renomeando o valor da string de status do retorno do gateway para o padrão da plataforma.
