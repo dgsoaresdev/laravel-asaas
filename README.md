@@ -3,7 +3,7 @@
 
 
 <h4 align="center"> 
-	🚧 Version 1.0 🚀 Em desenvolvimento... 🚧
+ Version 1.0 🚀 Concluído! 
 </h4>
 
 <p align="center">
@@ -24,13 +24,13 @@ sistema de processamento de pagamentos integrado ao ambiente de homologação do
 
 ## 💻 ROADMAP
 - Estruturas Globais: 100%
-- Routes: 50%
-- Controllers: 40%
-- Views: 70%
-- Models: 10%
-- Migrations & Seeders: 10%
-- API Asaas: 0%
-- Deploy: 0%
+- Routes: 100%
+- Controllers: 100%
+- Views: 100%
+- Models: 100%
+- Migrations 100%
+- API Asaas: 100%
+- Deploy: 100%
 
 ## 💻 Arquitetura
 
@@ -50,6 +50,8 @@ Descrição...
 As seguintes ferramentas foram usadas na construção do projeto:
 
 - Laravel 8
+- PHP 7.4
+- Conposer 2
 - PHP e MySQL
 - Bootstrap
 - HTML5 e CSS3
