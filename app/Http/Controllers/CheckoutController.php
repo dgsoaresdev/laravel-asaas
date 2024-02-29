@@ -19,6 +19,7 @@ class CheckoutController extends Controller
      */
     public function index( Request $request )
     {
+        
         // Get Shopping Cart Session
         $shoppingCart = session( 'shoppingCart' );
         $cart_total_price = session( 'cart_total_price' );
@@ -34,6 +35,8 @@ class CheckoutController extends Controller
      */
     public function create( Request $request )
     {
+
+        
         $status_request = null;
         $trans_code = null;
         $order_id = null;
@@ -41,7 +44,97 @@ class CheckoutController extends Controller
         $get_ip_user = $request->ip();
 
         if ( isset($request)) {
+            //=========================================
+            // Tratando os campos obrigatórios através do método nativo do Laravel
+            //=========================================
+            $request->validate([
+                'name'            => 'required',
+                'surname'         => 'required',
+                'email'           => 'required|email',
+                'cpfCnpj'         => 'required|min:11|max:18', 
+                'telefone'        => 'required|min:10|max:15', 
+                'mobilePhone'     => 'required|min:11|max:15',
+                'address'         => 'required',
+                'addressNumber'   => 'required',
+                'complement'      => 'required',
+                'province'        => 'required',
+                'city'            => 'required',
+                'state'           => 'required',
+                'postalCode'      => 'required|min:8|max:10',
+            ],
+            [
+                'name.required'              => 'O campo "nome" é obrigatório.',
+                'surname.required'           => 'O campo "sobrenome" é obrigatório.',
+                'email.required'             => 'O campo "E-mail" é obrigatório.',
+                'email.email'                => 'Digite um "E-mail" válidono.',
+                'cpfCnpj.required'           => 'O campo "CPF/CNPJ" é obrigatório.',
+                'cpfCnpj.min'                => 'Preencha corretamente o campo "CPF/CNPJ".',
+                'cpfCnpj.max'                => 'Preencha corretamente o campo "CPF/CNPJ".',
+                'telefone.required'          => 'O campo "telefone" é obrigatório.',
+                'telefone.min'               => 'Preencha corretamente o campo telefone.',
+                'telefone.max'               => 'Preencha corretamente o campo telefone.',
+                'mobilePhone.required'       => 'O campo "Celular" é obrigatório.',
+                'mobilePhone.min'            => 'Preencha corretamente o campo "celular".',
+                'mobilePhone.max'            => 'Preencha corretamente o campo "celular".',
+                'address.required'           => 'O campo "Endereço" é obrigatório.',
+                'addressNumber.required'     => 'O campo "Número" é obrigatório.',
+                'province.required'          => 'O campo "Bairro" é obrigatório.',
+                'city.required'              => 'O campo "Cidade" é obrigatório.',
+                'state.required'             => 'O campo "Estado" é obrigatório.',
+                'postalCode.required'        => 'O campo "CEP" é obrigatório.',
+                'postalCode.min'             => 'Preencha corretamente o campo CEP.',
+                'postalCode.max'             => 'Preencha corretamente o campo CEP.',
+            ]
+        );
+        if ( $request->input('payment_method') == 'cartao' ) {
+                //=================
+                // Validações de campos do Cartão de Crédito
+                //=================
+                $request->validate([
+                    'cartao_nome'     => 'required',
+                    'cartao_numero'   => 'required|min:16|max:19',
+                    'cartao_data_mes' => 'required|min:2|max:2',
+                    'cartao_data_ano' => 'required|min:4|max:4',
+                    'cartao_codigo'   => 'required|min:3|max:4',
+                    'cartao_parcela'  => 'required',
+                    'cartao_cpf'      => 'required|min:11|max:18',
+                ],
+                [
+                    'cartao_nome.required'       => 'O campo "nome do titular do cartão" é obrigatório.',
+                    'cartao_numero.required'     => 'O campo "número do cartão" é obrigatório.',
+                    'cartao_numero.min'          => 'Preencha corretamente o campo número do cartão.',
+                    'cartao_numero.max'          => 'Preencha corretamente o campo  número do cartão.',
+                    'cartao_data_mes.required'   => 'O campo "Mês de  Validade" é obrigatório.',
+                    'cartao_data_mes.min'        => 'Preencha corretamente o campo Mês de  Validade do cartão.',
+                    'cartao_data_mes.max'        => 'Preencha corretamente o campo Mês de  Validade do cartão.',
+                    'cartao_data_ano.required'   => 'O campo "Ano de Validade" é obrigatório.',
+                    'cartao_data_ano.min'        => 'Preencha corretamente o campo Ano de Validade do cartão.',
+                    'cartao_data_ano.max'        => 'Preencha corretamente o campo Ano de Validade do cartão.',
+                    'cartao_codigo.required'     => 'O campo "CVV" é obrigatório.',
+                    'cartao_codigo.min'          => 'Preencha corretamente o campo CVV do cartão.',
+                    'cartao_codigo.max'          => 'Preencha corretamente o campo CVV do cartão.',
+                    'cartao_parcela.required'    => 'O campo "número do cartão" é obrigatório.',
+                    'cartao_cpf.required'        => 'O campo "CPF do titular do cartão" é obrigatório.',
+                    'cartao_cpf.min'             => 'Preencha corretamente o campo CPF do titular do cartão.',
+                    'cartao_cpf.max'             => 'Preencha corretamente o campo CPF do titular do cartão.',
+                ]
+            );
+        }
+            //==========
+            // Retirando os caracteres especiais das strings
+            //==========
+            $customer_cpfCnpj          = $this->RemoveSpecialChar( $request->input('cpfCnpj') );
+            $customer_telefone         = $this->RemoveSpecialChar( $request->input('telefone') );
+            $customer_mobilePhone      = $this->RemoveSpecialChar( $request->input('mobilePhone') );
+            $customer_postalCode       = $this->RemoveSpecialChar( $request->input('postalCode') );
 
+            $customer_cartao_numero    = $this->RemoveSpecialChar( $request->input('cartao_numero') );
+            $customer_cartao_data      = $this->RemoveSpecialChar( $request->input('cartao_data') );
+            $customer_cartao_codigo    = $this->RemoveSpecialChar( $request->input('cartao_codigo') );
+            $customer_cartao_cpf       = $this->RemoveSpecialChar( $request->input('cartao_cpf') );
+
+            //==========
+            // Atribuindo as carrinho às Strings.
             $shoppingCart = session( 'shoppingCart' );
             $cart_total_price = session( 'cart_total_price' );            
             
@@ -58,16 +151,17 @@ class CheckoutController extends Controller
             $customer->name             = $request->input('name');
             $customer->surname          = $request->input('surname');
             $customer->email            = $request->input('email');
-            $customer->cpfCnpj          = $request->input('cpfCnpj');
-            $customer->telefone         = $request->input('telefone');
-            $customer->mobilePhone      = $request->input('mobilePhone');
+            $customer->cpfCnpj          = $customer_cpfCnpj;
+            $customer->telefone         = $customer_telefone;
+            $customer->mobilePhone      = $customer_mobilePhone;
             $customer->address          = $request->input('address');
             $customer->addressNumber    = $request->input('addressNumber');
             $customer->complement       = $request->input('complement');
             $customer->province         = $request->input('province');
             $customer->city             = $request->input('city');
             $customer->state            = $request->input('state');
-            $customer->postalCode       = $request->input('postalCode');
+            $customer->postalCode       = $customer_postalCode;
+            
 
             $customer->save();
             $customer_id = $customer->id;
@@ -310,6 +404,125 @@ class CheckoutController extends Controller
                     //Strings de response, que definem a URL de redirecionamento
                     $order_code = $gateway_order->id;
                     $status_request = 'success';
+
+                    //===================================================================
+                    // Validando campos
+                    //===================================================================
+                    //====
+                    // CPF Cadastro
+                    //====
+                    if ( !$this->validaCPF(  $customer_cpfCnpj ) ) {
+                
+                        $order_code = 'error-1003';
+                        $status_request = 'error';
+                        $trans_code = 'Por favor, digite um CPF válido, no cadastro';
+
+                        $order->status  = 'failed';
+                        $order->gateway_code  = 'error-1003';
+                        $order->save(); // salva o ID (gateway) do pedido
+                             
+                        // Redionrecionamento construído a partor dos responses acima.
+                        return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
+                    }
+
+                   
+                     //===============================================
+                    // Validações dos campos do cartão de crédito
+                    //===============================================
+                    if ( $request->input('payment_method') == 'cartao' ) {
+                       
+                        //====
+                        // CPF no cartão
+                        //====
+                        if ( !$this->validaCPF(  $customer_cartao_cpf ) ) {
+                    
+                            $order_code = 'error-1007';
+                            $status_request = 'error';
+                            $trans_code = 'Por favor, digite um CPF válido, no cartão';
+
+                            $order->status  = 'failed';
+                            $order->gateway_code  = 'error-1007';
+                            $order->save(); // salva o ID (gateway) do pedido
+                                
+                            // Redionrecionamento construído a partor dos responses acima.
+                            return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
+                        }
+
+
+                        //====
+                        // Número do cartão
+                        //====
+                        if ( !$this->validationCreditCard((int)$customer_cartao_numero) ) {
+                    
+                            $order_code = 'error-1009';
+                            $status_request = 'error';
+                            $trans_code = 'Digite um número válido de cartão de crédito.';
+
+                            $order->status  = 'failed';
+                            $order->gateway_code  = 'error-1009';
+                            $order->save(); // salva o ID (gateway) do pedido
+                                
+                            // Redionrecionamento construído a partor dos responses acima.
+                            return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
+                        }
+                    }
+                    //====
+                    // Telefone
+                    //====
+                    // if ( !$this->validaTelefone(  $customer_telefone ) ) {
+                
+                    //     $order_code = 'error-1004';
+                    //     $status_request = 'error';
+                    //     $trans_code = 'Por favor, digite um número de telefone válido';
+
+                    //     $order->status  = 'failed';
+                    //     $order->gateway_code  = 'error-1004';
+                    //     $order->save(); // salva o ID (gateway) do pedido
+                             
+                    //     // Redionrecionamento construído a partor dos responses acima.
+                    //     return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
+                    // }
+
+                    //====
+                    // Telefone Celular
+                    //====
+
+                    // if ( !$this->validaTelefone(  $customer_mobilePhone ) ) {
+                
+                    //     $order_code = 'error-1005';
+                    //     $status_request = 'error';
+                    //     $trans_code = 'Por favor, digite um número de telefone celular válido';
+
+                    //     $order->status  = 'failed';
+                    //     $order->gateway_code  = 'error-1005';
+                    //     $order->save(); // salva o ID (gateway) do pedido
+                             
+                    //     // Redionrecionamento construído a partor dos responses acima.
+                    //     return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
+                    // }
+
+                    //====
+                    // CEP
+                    //====
+
+                    if ( !$this->validaCEP(  $customer_postalCode ) ) {
+                
+                        $order_code = 'error-1006';
+                        $status_request = 'error';
+                        $trans_code = 'Por favor, CEP válido';
+
+                        $order->status  = 'failed';
+                        $order->gateway_code  = 'error-1006';
+                        $order->save(); // salva o ID (gateway) do pedido
+                             
+                        // Redionrecionamento construído a partor dos responses acima.
+                        return redirect('/checkout/'.$order_code.'/'.$status_request.'/'.$trans_code);        
+                    }
+
+
+                    //===================================================================
+                    // END - Validando campos
+                    //===================================================================
 
                 } else {
 
@@ -596,6 +809,11 @@ class CheckoutController extends Controller
         $error_library_arr = array(
             'error-1001' => 'Transação não autorizada. Verifique os dados do cartão de crédito e tente novamente.',
             'error-1002' => 'Erro ao tentar cadastrar o usuário. Por favor, tente novamente ou solicite um suporte.',
+            'error-1003' => 'Por favor, digite um CPF válido',
+            'error-1004' => 'Por favor, digite um e-mail válido',
+            'error-1005' => 'Por favor, digite um CEP válido',
+            'error-1006' => 'Por favor, digite um número de celular válido',
+            'error-1007' => 'Por favor, digite um número de telefone válido',
             'invalid_action' => $value,
         );
 
@@ -665,6 +883,301 @@ class CheckoutController extends Controller
     {
         //
     }
+
+    /*
+    ===============================================================================================================
+    #Validações de campos
+    ===============================================================================================================
+    */
+
+    public function RemoveSpecialChar($str){
+      
+        // Using preg_replace() function 
+        // to replace the word 
+        //$res = preg_replace('/[0-9\@\.\;\" "]+/', '',$str);
+        $res = str_ireplace( array( '\'', '"', ',' , ';', '<', '>', '.', '-', ' ', '(', ')' ), '', $str);
+        // Returning the result 
+        return $res;
+    }
+
+    public function validaCPF($cpf = "") {
+ 
+        // Extrai somente os números
+        //$cpf = '00622707370';
+        $cpf = preg_replace( '/[^0-9]/is', '', $cpf );
+         
+        // Verifica se foi informado todos os digitos corretamente
+        if (strlen($cpf) != 11) {
+            return false;
+        }
+    
+        // Verifica se foi informada uma sequência de digitos repetidos. Ex: 111.111.111-11
+        if (preg_match('/(\d)\1{10}/', $cpf)) {
+            return false;
+        }
+    
+        // Faz o calculo para validar o CPF
+        for ($t = 9; $t < 11; $t++) {
+            for ($d = 0, $c = 0; $c < $t; $c++) {
+                $d += $cpf[$c] * (($t + 1) - $c);
+            }
+            $d = ((10 * $d) % 11) % 10;
+            if ($cpf[$c] != $d) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // public function validaTelefone($telefone){
+        
+    //     $telefone= trim(str_replace('/', '', str_replace(' ', '', str_replace('-', '', str_replace(')', '', str_replace('(', '', $telefone))))));
+    
+    //     $regexTelefone = "^[0-9]{11}$";
+    
+    //     //$regexCel = '/[0-9]{2}[6789][0-9]{3,4}[0-9]{4}/'; // Regex para validar somente celular
+    //     if (preg_match($regexTelefone, $telefone)) {
+    //         return true;
+    //     }else{
+    //         return false;
+    //     }
+    // }
+
+    public function validaCEP($CEPNumber){
+        
+        if(!preg_match('/^[0-9]{5,5}([- ]?[0-9]{3,3})?$/', $CEPNumber)) {
+           return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function validationCreditCard($cardNumber)
+    {
+        $number = substr($cardNumber, 0, -1);
+        $doubles = [];
+    
+        for ($i = 0, $t = strlen($number); $i < $t; ++$i) {
+            $doubles[] = substr($number, $i, 1) * ($i % 2 == 0? 2: 1);
+        }
+    
+        $sum = 0;
+    
+        foreach ($doubles as $double) {
+            for ($i = 0, $t = strlen($double); $i < $t; ++$i) {
+                $sum += (int) substr($double, $i, 1);
+            }
+        }
+    
+        return substr($cardNumber, -1, 1) == (10-$sum%10)%10;
+    }
+    
+   
+
+    //==================================
+    // END - CUSTOMIZER APP - 2022, Out
+    //==================================
+
+     //==================================
+    // CUSTOMIZER APP - 2023, Mar
+    //==================================
+
+    public function cvf_convert_object_to_array($data = "") {
+
+        if (is_object($data)) {
+            $data = get_object_vars($data);
+        }
+    
+        if (is_array($data)) {
+            return array_map(__FUNCTION__, $data);
+        }
+        else {
+            return $data;
+        }
+        return $data;
+    }
+
+
+//     public function validacao_de_campos($field_type="", $field_value = "")
+//     {
+
+//             $verify_data_begins = array();
+//             //=======
+//             // Valida CPF
+//             // Retira os carecteres especiais do CPF
+//             $vat_number = $this->crud_model->RemoveSpecialChar( html_escape( $get_data_user['vat_number'] ) );
+//             // Checa se o número do CPF é válido e retorna com erro, caso não seja
+//             if ( !$this->crud_model->validaCPF(  $vat_number ) ) {
+//                 $verify_data_begins_cpf = array(
+//                     'referral' => 'vat_number',
+//                     'status' => 'error',            
+//                     'response' => get_phrase('check_your_vat_number_in_personal_data')
+//                 );
+//                 $get_data_user['vat_number'] = $vat_number;        
+//             } else {
+//                 // se o CPF for válido, atualiza o dado com o dado limpo de caracteres especiais.
+//                 $verify_data_begins_cpf = array(
+//                     'referral' => 'vat_number',
+//                     'status' => 'success',            
+//                     'response' => $vat_number
+//                 ); 
+                
+//             }
+            
+
+//             array_push($verify_data_begins,$verify_data_begins_cpf);
+
+
+//             //=======
+//             // Valida Número do Cartão de crédito
+//             if ($payment_type == 'credit_card') {
+//             $payment_data_ = (array)json_decode($payment_data);
+//             $payment_data_new = array();
+//             foreach( $payment_data_ as $key => $value){
+//                     $payment_data_new = array_merge($payment_data_new,(array)$value);
+//             }
+            
+//             // Retira caracteres especiais
+//             $card_number = $this->crud_model->RemoveSpecialChar( html_escape( $payment_data_new['card_number'] ) );
+
+//                 if (!$this->crud_model->validationCreditCard($card_number) ) {
+//                 $verify_data_begins_credit_card = array(
+//                     'referral' => 'credit_card_number',
+//                     'status' => 'error',            
+//                     'response' => get_phrase('insert_a_valid_card_number'),
+//                 );
+//             } else {
+//                 $verify_data_begins_credit_card = array(
+//                     'referral' => 'credit_card_number',
+//                     'status' => 'success',          
+//                     'response' => null,
+//                 );
+//             }
+
+//             array_push($verify_data_begins,$verify_data_begins_credit_card);
+//             }
+            
+//             //=========================
+//             // Valida Telefone
+//             //=========================
+//             // Retira os carecteres especiais
+//             $phonenumber  = $this->crud_model->RemoveSpecialChar( html_escape( $get_data_user['phonenumber'] ) );
+//             $get_data_user['phonenumber'] = $phonenumber;
+//             //===========
+//             // Valida CEP
+//             //==========
+//             // Retira os carecteres especiais
+//             $zipcode = $this->crud_model->RemoveSpecialChar( html_escape( $get_data_user['zipcode'] ) );
+//             $get_data_user['zipcode'] = $zipcode;
+                    
+//             //=========================
+//             // Valida E-mail
+//             //=========================
+//             if ( $this->session->userdata('user_login') == 1 || $this->session->userdata('admin_login') == 1 ) {
+//                 $user_logged = true;
+//                 $get_user_details = $this->user_model->get_user( $this->session->userdata('user_id') )->row_array();
+//             } else {
+//                 $user_logged = false;
+//             }
+            
+//             // Valida e-mail e verifica se já está cadastrado
+//             $validity = $this->user_model->check_duplication('on_create', $get_data_user['email']);        
+//             if ( $validity === true ) {
+
+//                 $verify_data_begins_email = array(
+//                     'referral' => 'email',
+//                     'status' => 'success',            
+//                     'response' => $get_data_user['email']
+//                 ); 
+
+//             } elseif ( $validity === false && $user_logged && $get_user_details['email'] === $get_data_user['email'] ) {
+
+//                 $verify_data_begins_email = array(
+//                     'referral' => 'email',
+//                     'status' => 'success',            
+//                     'response' => $get_data_user['email']
+//                 ); 
+
+//             } elseif ( $validity === false && !$user_logged ) { 
+//                 $verify_data_begins_email = array(
+//                     'referral' => 'email',
+//                     'status' => 'error',            
+//                     'response' => get_phrase('you_have_already_registered')
+//                 ); 
+//             }
+            
+
+//             array_push($verify_data_begins,$verify_data_begins_email);
+
+//             //$verify_data_begins = array_merge($verify_data_begins_cpf, $verify_data_begins_email);
+
+//             //var_dump($verify_data_begins);
+
+//             foreach($verify_data_begins as $verify_data_begins_item) {
+
+//                 if ( in_array('error', $verify_data_begins_item) ) {
+//                 $verify_error = true;
+//                 $referral_error = $verify_data_begins_item['referral'];
+//                 $response_error = $verify_data_begins_item['response'];
+//                 }
+//             }
+
+//             if ($verify_error) {
+//                 $verify_error_status = 'error';
+//                 $verify_error_response = $response_error;
+//                 $verify_error_referral = $referral_error;
+//             } else {
+//                 $verify_error_status = 'success';
+//                 $verify_error_response = NULL;
+//                 $verify_error_referral = NULL;
+//             }
+
+//             // Continue, if all data this is sanialyzered.
+//             // if ( $verify_error_status === 'success' ) {
+//             //     $sanialyze_status = 'success';
+//             //     $sanialyze_response = NULL;
+//             // } else {
+//             //     $sanialyze_status = 'error';
+//             //     $sanialyze_response = $verify_error_response;
+//             // }
+
+
+                
+
+//             //=============== end Samialyze
+
+            
+//             //$arr_items = $this->input->post('arr_items');
+//             // Sanialyze data
+//             $page_data['sanialyze_status'] = $verify_error_status;
+//             $page_data['verify_error_response'] = $verify_error_response;
+//             $page_data['verify_error_referral'] = $verify_error_referral;
+//             // Data past to load view
+//             $page_data['payment_method'] = $payment_type;
+//             $page_data['payment_data'] = $payment_data;
+//             $page_data['payment_user'] = $payment_user;
+//             $page_data['cart_data'] = $cart_data;
+//             $page_data['cart_type'] = $cart_type;
+//             $page_data['cart_amount'] = $cart_amount;
+//             $page_data['coupon'] = $coupon;
+            
+//             if ( $verify_error_status == 'error') {
+//             echo 'error|' . $verify_error_referral;
+//             } else {
+//                 $this->load->view('payment/payment_api_response', $page_data);
+//             }
+//         }
+
+// }
+
+
+
+
+    /*
+    ===============================================================================================================
+    #END - Validações de campos
+    ===============================================================================================================
+    */
 
     /** DEBUG
      *  Função criada para simular, testar, debugar as requisições - emulando uma consulta a API do gateway

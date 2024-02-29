@@ -58,8 +58,12 @@
                             <header class="Section-header">
                                 <h2>Checkout</h2>
                             </header>
+                            <pre class="errorContainer rounded">
+                                @foreach($errors->all() as $error_value)
+                                {{ $error_value }} <br>
+                                @endforeach
+                            </pre>
                             <div class="Section-main d-flex flex-column flex-sm-row col-12">
-                            {{-- {{ $slot }} --}}
                             <form action="{{ route('checkout') }}" class="d-flex flex-column flex-sm-row col-12" method="post">
                                 @csrf
                                 {{-- PRODUCT DATA --}}
@@ -71,18 +75,14 @@
                                         <div class="mb-2">
                                             <h3>Dados Pessoais</h3>
                                         </div>
-                                        <div class="mb-2 card col-12">
-                                            <div class="card-body">
-                                                <h4 class="card-title">Você já tem cadastro? <strong><a href="#">Faça o login</a></strong></h4>
-                                            </div>
-                                        </div>
+                                       
 
                                     </div>
 
                                     <div class="row">
                                         <div class="mb-2 card col-12">
                                             <div class="card-body">
-                                                <h4 class="card-title">Ainda não possui cadastro? <strong>Cadastre-se</strong></h4>
+                                                <h4 class="card-title"><strong>Cadastre seus dados</strong></h4>
                                             </div>
                                             @component('layouts._components.form_cadastro', [ 'data_fields' =>  $data_fields ])
                                             @endcomponent
