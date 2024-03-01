@@ -1,6 +1,7 @@
 <h1 align="center">
-    <img alt="Laravel Asaas" title="Laravel Asaas" src="https://github.com/dgsoaresdev/laravel-asaas/assets/25693566/057de366-bde3-40e3-b446-911eb8562193" width="100%" />
+    <a href="https://diogosoares.com.br/projetos/laravel_asaas/public/" target="_blank"><img alt="Laravel Asaas" title="Laravel Asaas" src="https://github.com/dgsoaresdev/laravel-asaas/assets/25693566/057de366-bde3-40e3-b446-911eb8562193" width="100%" /></a>
 
+<a href="https://diogosoares.com.br/projetos/laravel_asaas/public/" target="_blank">Acesse o projeto publicado</a>
 
 <h4 align="center"> 
  Version 1.0 🚀 Concluído! 
