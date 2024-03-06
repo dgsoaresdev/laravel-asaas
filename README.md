@@ -62,7 +62,7 @@ A partir dos dados listados abaixo, você poderá realizar testes na aplicação
 - Clique em Pagar com segurança
 - Se a compra for aprovada, é esperada uma tela de sucesso, com os dados do pedido e também um botão para a ipressão do documento do pagamento.
 - Se a compra não for aprovada, é esperado que o usuário permaneça na mesma tela e receba a iformação do motivo da falha no pagamento.
--     Nesta situação, a palicação salva o pedido no banco de dados e disponibiliza o checkout do pedido na tela, para que o usuário faça uma nova tentativa de pagamento, mantendo as 3 opções de pagamento como válidas.
+- Nesta situação, a palicação salva o pedido no banco de dados e disponibiliza o checkout do pedido na tela, para que o usuário faça uma nova tentativa de pagamento, mantendo as 3 opções de pagamento como válidas.
 
 ### Boleto
 - Clique no botão "Pagar com segurança", contido no card Boleto.
