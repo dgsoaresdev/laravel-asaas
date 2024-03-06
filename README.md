@@ -52,13 +52,13 @@ A partir dos dados listados abaixo, você poderá realizar testes na aplicação
 
 ### Cartão de Crédito
 - Preencha todos os campos obrigatórios contidos no card "Cartão de Crédito"
--     Nome: Insira um nome qualquer
--     Número do cartão: 5515 0436 9862 9208 (gerador na internet)
--         Caso queira simular um erro é necessário informar o cartão de crédito de número 5184019740373151 (Mastercard) ou 4916561358240741 (Visa).
--     Validade: Selecione qualquer mês ou ano (Obs: Na aplicação não foi feita ainda uma validação que impeça o usuário de incluir os meses passados dentro do mesmo ano.)
--     CVV: Qualquer número entre 3 e 4 dígitos.
--     Parcela: 1
--     CPF: Digite um CPF válido.
+- Nome: Insira um nome qualquer
+- Número do cartão: 5515 0436 9862 9208 (gerador na internet)
+- Caso queira simular um erro no cartão, é necessário informar o cartão de crédito de número 5184019740373151 (Mastercard) ou 4916561358240741 (Visa).
+- Validade: Selecione qualquer mês ou ano (Obs: Na aplicação não foi feita ainda uma validação que impeça o usuário de incluir os meses passados dentro do mesmo ano.)
+- CVV: Qualquer número entre 3 e 4 dígitos.
+- Parcela: 1
+- CPF: Digite um CPF válido.
 - Clique em Pagar com segurança
 - Se a compra for aprovada, é esperada uma tela de sucesso, com os dados do pedido e também um botão para a ipressão do documento do pagamento.
 - Se a compra não for aprovada, é esperado que o usuário permaneça na mesma tela e receba a iformação do motivo da falha no pagamento.
@@ -70,12 +70,12 @@ A partir dos dados listados abaixo, você poderá realizar testes na aplicação
 - Após a requisição, é esperada uma nova tela, com o botão de link para a geração do boleto em PDF.
 
 ## 🛠 Tabelas do banco de dados
-- customers: Guarda os dados de todos os compradores.
-- orders: Guarda os dados de todos os pedidos.
-- payments: Guarda os dados de pagamentos:
--     Toda tentativa ou efetivação de pagamento é registrada na tabela payments.
--     Na tabela payments são guaradados todos os dados referente ao pagamento do pedido.
--     A tabela payments se relaciona com as tabelas "customers" através da coluna customer_id e "orders" através da coluna order_id.
+- Tabela "customers": Guarda os dados de todos os compradores.
+- Tabela "orders": Guarda os dados de todos os pedidos.
+- Tabela "payments": Guarda os dados de pagamentos:
+- payments: Toda tentativa ou efetivação de pagamento é registrada na tabela payments.
+- payments: Na tabela payments são guaradados todos os dados referente ao pagamento do pedido.
+- payments: A tabela payments se relaciona com as tabelas "customers" através da coluna customer_id e "orders" através da coluna order_id.
   
 
 ## 🛠 Tecnologias
