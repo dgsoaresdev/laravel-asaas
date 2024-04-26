@@ -11,7 +11,7 @@
   
   <img src="https://img.shields.io/static/v1?label=Languages&message=Laravel/PHP/JavaScript/CSS3/HTML5&color=blue&style=flat" />
   	
-  <a href="https://twitter.com/DgSoaresDev">
+  <a href="https://twitter.com/DgSoaresTech">
     <img alt="Siga no Twitter" src="https://img.shields.io/twitter/url?url=https://twitter.com/DgSoaresTech">
   </a>
 	
@@ -84,7 +84,7 @@ As seguintes ferramentas foram usadas na construção do projeto:
 
 - Laravel 8
 - PHP 7.4
-- Conposer 2
+- Composer 2
 - PHP e MySQL
 - Bootstrap
 - HTML5 e CSS3
