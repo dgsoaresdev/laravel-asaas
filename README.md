@@ -1,4 +1,4 @@
-<h1 align="center">
+<h1 align="center">Página de Checkout em Laravel, integrado ao gateway Asaas (Cartão, Pix e Boleto)</h1>
     <a href="https://diogosoares.com.br/projetos/laravel_asaas/public/" target="_blank"><img alt="Laravel Asaas" title="Laravel Asaas" src="https://github.com/dgsoaresdev/laravel-asaas/assets/25693566/057de366-bde3-40e3-b446-911eb8562193" width="100%" /></a>
 
 <a href="https://diogosoares.com.br/projetos/laravel_asaas/public/" target="_blank">Acesse o projeto publicado</a>
@@ -21,7 +21,7 @@
 
 
 ## 💻 Sobre o projeto
-sistema de processamento de pagamentos integrado ao ambiente de homologação do Asaas, levando em consideração que o cliente deve acessar uma página onde irá selecionar a opção de pagamento entre Boleto, Cartão ou Pix.
+Sistema de processamento de pagamentos integrado ao ambiente de homologação do Asaas, levando em consideração que o cliente deve acessar uma página onde irá selecionar a opção de pagamento entre Boleto, Cartão ou Pix.
 
 ## 💻 ROADMAP
 - Estruturas Globais: 100%
